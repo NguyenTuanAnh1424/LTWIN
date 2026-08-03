@@ -274,6 +274,12 @@ namespace LTWIN.Forms
 
             foreach (var item in posCartItems)
             {
+                var shoe = mockProductList.FirstOrDefault(p => p.ProductId == item.ProductId);
+                if (shoe != null)
+                {
+                    shoe.StockQuantity = Math.Max(0, shoe.StockQuantity - item.Quantity);
+                }
+
                 invoiceContent += $"• {item.ProductName}\n" +
                                   $"  Đơn giá: {item.UnitPrice:N0} VNĐ x {item.Quantity} = {item.TotalPrice:N0} VNĐ\n";
             }
@@ -328,6 +334,7 @@ namespace LTWIN.Forms
             numDiscount.Value = 0;
             numCustomerMoney.Value = 0;
             UpdateCartGrid();
+            LoadShoeGrid();
             UpdatePOSCalculations();
         }
 
