@@ -45,6 +45,11 @@ namespace LTWIN.Forms
             card4 = new Panel();
             lblCard4Value = new Label();
             lblCard4Title = new Label();
+            panelMainContent = new TableLayoutPanel();
+            panelChartArea = new Panel();
+            panelChartHeader = new Panel();
+            lblChartTitle = new Label();
+            panelChartCanvas = new Panel();
             panelGridArea = new Panel();
             dgvTopSelling = new DataGridView();
             panelGridHeader = new Panel();
@@ -55,6 +60,9 @@ namespace LTWIN.Forms
             card2.SuspendLayout();
             card3.SuspendLayout();
             card4.SuspendLayout();
+            panelMainContent.SuspendLayout();
+            panelChartArea.SuspendLayout();
+            panelChartHeader.SuspendLayout();
             panelGridArea.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvTopSelling).BeginInit();
             panelGridHeader.SuspendLayout();
@@ -274,13 +282,77 @@ namespace LTWIN.Forms
             // panelGridArea
             // 
             panelGridArea.BackColor = Color.White;
+            // 
+            // panelMainContent
+            // 
+            panelMainContent = new TableLayoutPanel();
+            panelMainContent.ColumnCount = 2;
+            panelMainContent.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 55F));
+            panelMainContent.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F));
+            panelMainContent.Controls.Add(panelChartArea, 0, 0);
+            panelMainContent.Controls.Add(panelGridArea, 1, 0);
+            panelMainContent.Dock = DockStyle.Fill;
+            panelMainContent.Location = new Point(15, 190);
+            panelMainContent.Name = "panelMainContent";
+            panelMainContent.RowCount = 1;
+            panelMainContent.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            panelMainContent.Size = new Size(990, 375);
+            panelMainContent.TabIndex = 2;
+            // 
+            // panelChartArea
+            // 
+            panelChartArea.BackColor = Color.White;
+            panelChartArea.Controls.Add(panelChartCanvas);
+            panelChartArea.Controls.Add(panelChartHeader);
+            panelChartArea.Dock = DockStyle.Fill;
+            panelChartArea.Location = new Point(0, 0);
+            panelChartArea.Margin = new Padding(0, 0, 10, 0);
+            panelChartArea.Name = "panelChartArea";
+            panelChartArea.Size = new Size(534, 375);
+            panelChartArea.TabIndex = 0;
+            // 
+            // panelChartCanvas
+            // 
+            panelChartCanvas.Dock = DockStyle.Fill;
+            panelChartCanvas.Location = new Point(0, 45);
+            panelChartCanvas.Name = "panelChartCanvas";
+            panelChartCanvas.Size = new Size(534, 330);
+            panelChartCanvas.TabIndex = 1;
+            panelChartCanvas.Paint += panelChartCanvas_Paint;
+            // 
+            // panelChartHeader
+            // 
+            panelChartHeader.BackColor = Color.White;
+            panelChartHeader.Controls.Add(lblChartTitle);
+            panelChartHeader.Dock = DockStyle.Top;
+            panelChartHeader.Location = new Point(0, 0);
+            panelChartHeader.Name = "panelChartHeader";
+            panelChartHeader.Padding = new Padding(15, 12, 15, 8);
+            panelChartHeader.Size = new Size(534, 45);
+            panelChartHeader.TabIndex = 0;
+            // 
+            // lblChartTitle
+            // 
+            lblChartTitle.AutoSize = true;
+            lblChartTitle.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            lblChartTitle.ForeColor = Color.FromArgb(47, 53, 66);
+            lblChartTitle.Location = new Point(12, 12);
+            lblChartTitle.Name = "lblChartTitle";
+            lblChartTitle.Size = new Size(250, 20);
+            lblChartTitle.TabIndex = 0;
+            lblChartTitle.Text = "📊 BIỂU ĐỒ TĂNG TRƯỞNG DOANH THU";
+            // 
+            // panelGridArea
+            // 
+            panelGridArea.BackColor = Color.White;
             panelGridArea.Controls.Add(dgvTopSelling);
             panelGridArea.Controls.Add(panelGridHeader);
             panelGridArea.Dock = DockStyle.Fill;
-            panelGridArea.Location = new Point(15, 190);
+            panelGridArea.Location = new Point(544, 0);
+            panelGridArea.Margin = new Padding(10, 0, 0, 0);
             panelGridArea.Name = "panelGridArea";
-            panelGridArea.Size = new Size(990, 375);
-            panelGridArea.TabIndex = 2;
+            panelGridArea.Size = new Size(446, 375);
+            panelGridArea.TabIndex = 1;
             // 
             // dgvTopSelling
             // 
@@ -298,7 +370,7 @@ namespace LTWIN.Forms
             dgvTopSelling.RowHeadersVisible = false;
             dgvTopSelling.RowTemplate.Height = 35;
             dgvTopSelling.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvTopSelling.Size = new Size(990, 330);
+            dgvTopSelling.Size = new Size(446, 330);
             dgvTopSelling.TabIndex = 1;
             // 
             // panelGridHeader
@@ -309,7 +381,7 @@ namespace LTWIN.Forms
             panelGridHeader.Location = new Point(0, 0);
             panelGridHeader.Name = "panelGridHeader";
             panelGridHeader.Padding = new Padding(15, 12, 15, 8);
-            panelGridHeader.Size = new Size(990, 45);
+            panelGridHeader.Size = new Size(446, 45);
             panelGridHeader.TabIndex = 0;
             // 
             // lblTopSelling
@@ -319,16 +391,16 @@ namespace LTWIN.Forms
             lblTopSelling.ForeColor = Color.FromArgb(47, 53, 66);
             lblTopSelling.Location = new Point(12, 12);
             lblTopSelling.Name = "lblTopSelling";
-            lblTopSelling.Size = new Size(260, 20);
+            lblTopSelling.Size = new Size(200, 20);
             lblTopSelling.TabIndex = 0;
-            lblTopSelling.Text = "🔥 TOP 5 MẪU GIÀY BÁN CHẠY NHẤT";
+            lblTopSelling.Text = "🔥 TOP MẪU GIÀY BÁN CHẠY";
             // 
             // FormReport
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1020, 580);
-            Controls.Add(panelGridArea);
+            Controls.Add(panelMainContent);
             Controls.Add(panelCards);
             Controls.Add(panelTop);
             Name = "FormReport";
@@ -346,6 +418,10 @@ namespace LTWIN.Forms
             card3.PerformLayout();
             card4.ResumeLayout(false);
             card4.PerformLayout();
+            panelMainContent.ResumeLayout(false);
+            panelChartArea.ResumeLayout(false);
+            panelChartHeader.ResumeLayout(false);
+            panelChartHeader.PerformLayout();
             panelGridArea.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvTopSelling).EndInit();
             panelGridHeader.ResumeLayout(false);
@@ -372,6 +448,11 @@ namespace LTWIN.Forms
         private Panel card4;
         private Label lblCard4Title;
         private Label lblCard4Value;
+        private TableLayoutPanel panelMainContent;
+        private Panel panelChartArea;
+        private Panel panelChartHeader;
+        private Label lblChartTitle;
+        private Panel panelChartCanvas;
         private Panel panelGridArea;
         private Panel panelGridHeader;
         private Label lblTopSelling;

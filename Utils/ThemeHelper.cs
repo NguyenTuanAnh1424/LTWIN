@@ -56,5 +56,12 @@ namespace LTWIN.Utils
             btn.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btn.UseMnemonic = false;
         }
+
+        public static void AddHoverEffect(Button btn, Color normalBg, Color hoverBg)
+        {
+            if (btn == null) return;
+            btn.MouseEnter += (s, e) => btn.BackColor = hoverBg;
+            btn.MouseLeave += (s, e) => btn.BackColor = normalBg;
+        }
     }
 }
