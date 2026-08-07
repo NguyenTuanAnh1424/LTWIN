@@ -44,6 +44,7 @@ namespace LTWIN.Forms
                 btnProduct.Visible = false;
                 btnCategory.Visible = false;
                 btnReport.Visible = false;
+                btnEmployee.Visible = false;
 
                 // Mở sẵn các menu bán hàng POS, lịch sử hóa đơn, nhập kho và quản lý khách hàng
                 btnPOS.Visible = true;
@@ -64,6 +65,7 @@ namespace LTWIN.Forms
                 btnStockImport.Visible = true;
                 btnCustomer.Visible = true;
                 btnReport.Visible = true;
+                btnEmployee.Visible = true;
 
                 // Mặc định mở màn hình Quản Lý Giày
                 OpenChildForm(new FormProduct(), btnProduct, "QUẢN LÝ SẢN PHẨM GIÀY");
@@ -175,6 +177,11 @@ namespace LTWIN.Forms
                 IsLoggingOut = false;
                 Application.Exit();
             }
+        }
+
+        private void btnEmployee_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new FormEmployee(), (Button)sender, "QUẢN LÝ NHÂN VIÊN & TÀI KHOẢN");
         }
     }
 }
