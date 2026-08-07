@@ -198,6 +198,20 @@ namespace LTWIN.Forms
                 }
             }
         }
+        private void CalculateTotal()
+        {
+            decimal total = 0;
+
+            foreach (DataGridViewRow row in dgvCartList.Rows)
+            {
+                if (row.Cells["Total"].Value != null)
+                {
+                    total += Convert.ToDecimal(row.Cells["Total"].Value);
+                }
+            }
+            lblSubTotal.Text = total.ToString("N0") + " VNĐ";
+            lblGrandTotal.Text = total.ToString("N0") + " VNĐ";
+        }
 
         private void UpdatePOSCalculations()
         {
@@ -236,107 +250,6 @@ namespace LTWIN.Forms
             }
         }
 
-        private void btnCompletePayment_Click(object sender, EventArgs e)
-        {
-            if (!posCartItems.Any())
-            {
-                MessageBox.Show("Giỏ hàng hiện tại đang rỗng! Vui lòng chọn sản phẩm giày.", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            decimal subTotal = posCartItems.Sum(i => i.TotalPrice);
-            decimal discount = numDiscount.Value;
-            decimal grandTotal = Math.Max(0, subTotal - discount);
-            decimal customerMoney = numCustomerMoney.Value;
-
-            if (customerMoney < grandTotal && customerMoney > 0)
-            {
-                MessageBox.Show($"Số tiền khách đưa ({customerMoney:N0} VNĐ) còn thiếu {(grandTotal - customerMoney):N0} VNĐ!", "Cảnh Báo Thanh Toán", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            Customer selectedCustomer = cmbCustomer.SelectedItem as Customer ?? mockCustomerList[0];
-            string invoiceCode = "POS" + DateTime.Now.ToString("yyyyMMddHHmmss");
-
-            int earnedPoints = (int)(grandTotal / 100000);
-            if (selectedCustomer.CustomerId > 0 && earnedPoints > 0)
-            {
-                selectedCustomer.RewardPoints += earnedPoints;
-            }
-
-            string invoiceContent = $"========================================\n" +
-                                    $"       HÓA ĐƠN BÁN HÀNG SNEAKER STORE   \n" +
-                                    $"========================================\n" +
-                                    $"Mã Hóa Đơn : {invoiceCode}\n" +
-                                    $"Thời gian  : {DateTime.Now:dd/MM/yyyy HH:mm:ss}\n" +
-                                    $"Khách hàng : {selectedCustomer.FullName}\n" +
-                                    $"----------------------------------------\n";
-
-            foreach (var item in posCartItems)
-            {
-                var shoe = mockProductList.FirstOrDefault(p => p.ProductId == item.ProductId);
-                if (shoe != null)
-                {
-                    shoe.StockQuantity = Math.Max(0, shoe.StockQuantity - item.Quantity);
-                }
-
-                invoiceContent += $"• {item.ProductName}\n" +
-                                  $"  Đơn giá: {item.UnitPrice:N0} VNĐ x {item.Quantity} = {item.TotalPrice:N0} VNĐ\n";
-            }
-
-            invoiceContent += $"----------------------------------------\n" +
-                              $"Tổng tiền hàng: {subTotal:N0} VNĐ\n" +
-                              $"Chiết khấu    : -{discount:N0} VNĐ\n" +
-                              $"TỔNG THANH TOÁN: {grandTotal:N0} VNĐ\n" +
-                              $"Tiền khách đưa : {customerMoney:N0} VNĐ\n" +
-                              $"Tiền thừa trả  : {(customerMoney - grandTotal):N0} VNĐ\n" +
-                              $"----------------------------------------\n" +
-                              (selectedCustomer.CustomerId > 0 ? $"🎁 Tích lũy thêm: +{earnedPoints} Điểm (Tổng: {selectedCustomer.RewardPoints} Đ)\n" : "") +
-                              $"========================================\n" +
-                              $"Cảm ơn quý khách và hẹn gặp lại!\n";
-
-            var orderRecord = new POSOrderRecord
-            {
-                InvoiceCode = invoiceCode,
-                OrderDate = DateTime.Now,
-                CustomerName = selectedCustomer.FullName,
-                SubTotal = subTotal,
-                Discount = discount,
-                GrandTotal = grandTotal,
-                CustomerMoney = customerMoney,
-                ChangeMoney = Math.Max(0, customerMoney - grandTotal),
-                Status = "Hoàn Thành",
-                InvoiceContent = invoiceContent,
-                Items = posCartItems.Select(i => new POSCartItemRecord
-                {
-                    ProductId = i.ProductId,
-                    ProductName = i.ProductName,
-                    UnitPrice = i.UnitPrice,
-                    Quantity = i.Quantity
-                }).ToList()
-            };
-            OrderStore.AddOrder(orderRecord);
-
-            try
-            {
-                string fileName = $"HoaDon_POS_{invoiceCode}.txt";
-                using (FormInvoicePreview previewForm = new FormInvoicePreview("Hóa Đơn Bán Hàng POS", invoiceContent, fileName))
-                {
-                    previewForm.ShowDialog(this);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(invoiceContent + "\n\n⚠️ Lỗi: " + ex.Message, "Thông Báo Thanh Toán", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
-            posCartItems.Clear();
-            numDiscount.Value = 0;
-            numCustomerMoney.Value = 0;
-            UpdateCartGrid();
-            LoadShoeGrid();
-            UpdatePOSCalculations();
-        }
 
         private void btnSearchShoe_Click(object sender, EventArgs e)
         {
@@ -359,6 +272,172 @@ namespace LTWIN.Forms
             ).ToList();
 
             LoadShoeGrid(filtered);
+        }
+
+        private void dgvShoesList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                // Lấy thông tin đôi giày vừa click
+                DataGridViewRow row = dgvShoesList.Rows[e.RowIndex];
+                string productId = row.Cells["ProductId"].Value.ToString();
+                string productName = row.Cells["ProductName"].Value.ToString();
+                decimal price = Convert.ToDecimal(row.Cells["Price"].Value);
+
+                // 1. Kiểm tra xem giày này đã có trong giỏ hàng (dgvCartList) chưa
+                bool isExists = false;
+                foreach (DataGridViewRow cartRow in dgvCartList.Rows)
+                {
+                    if (cartRow.Cells["ProductId"].Value != null && cartRow.Cells["ProductId"].Value.ToString() == productId)
+                    {
+                        // Nếu có rồi thì cộng thêm 1 vào số lượng
+                        int currentQuantity = Convert.ToInt32(cartRow.Cells["Quantity"].Value);
+                        cartRow.Cells["Quantity"].Value = currentQuantity + 1;
+                        cartRow.Cells["Total"].Value = (currentQuantity + 1) * price;
+                        isExists = true;
+                        break;
+                    }
+                }
+
+                // 2. Nếu chưa có thì tạo một dòng mới trong giỏ hàng
+                if (!isExists)
+                {
+                    dgvCartList.Rows.Add(productId, productName, 1, price, price);
+                }
+
+                // 3. Tính lại tổng tiền sau khi thêm
+                CalculateTotal();
+            }
+        }
+
+        private void btnCompletePayment_Click(object sender, EventArgs e)
+        {
+            if (!posCartItems.Any())
+            {
+                MessageBox.Show("Giỏ hàng hiện tại đang rỗng! Vui lòng chọn sản phẩm giày.", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            decimal subTotal = posCartItems.Sum(i => i.TotalPrice);
+            decimal discount = numDiscount.Value;
+            decimal grandTotal = Math.Max(0, subTotal - discount);
+            decimal customerMoney = numCustomerMoney.Value;
+
+            // SỬA LỖI 1: Chỉ cần kiểm tra tiền khách đưa nhỏ hơn tổng tiền là chặn luôn
+            if (customerMoney < grandTotal)
+            {
+                MessageBox.Show($"Số tiền khách đưa ({customerMoney:N0} VNĐ) còn thiếu {(grandTotal - customerMoney):N0} VNĐ!", "Cảnh Báo Thanh Toán", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Kết nối Database thật để lưu
+            using (var db = new QlyBanGiayContext())
+            {
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        User selectedCustomer = cmbCustomer.SelectedItem as User;
+                        int customerId = selectedCustomer != null ? selectedCustomer.UserId : 1;
+                        string customerName = selectedCustomer != null ? selectedCustomer.FullName : "Khách Lẻ";
+
+                        string invoiceCode = "POS" + DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                        // Tính điểm thưởng (100k = 1 điểm)
+                        int earnedPoints = (int)(grandTotal / 100000);
+                        if (customerId > 0 && earnedPoints > 0)
+                        {
+                            // Cập nhật điểm cho User trong DB thật
+                            var dbUser = db.Users.Find(customerId);
+                            if (dbUser != null)
+                            {
+                                dbUser.RewardPoints += earnedPoints;
+                            }
+                        }
+
+                        // Lưu Hóa Đơn vào DB thật
+                        var newOrder = new Order
+                        {
+                            OrderDate = DateTime.Now,
+                            TotalAmount = grandTotal,
+                            UserId = customerId
+                            // Nếu DB của bạn có thêm cột Discount hay InvoiceCode thì map vào đây
+                        };
+                        db.Orders.Add(newOrder);
+                        db.SaveChanges(); // Lấy OrderId
+
+                        // Chuẩn bị chuỗi in hóa đơn
+                        string invoiceContent = $"========================================\n" +
+                                                $"       HÓA ĐƠN BÁN HÀNG SNEAKER STORE   \n" +
+                                                $"========================================\n" +
+                                                $"Mã Hóa Đơn : {invoiceCode}\n" +
+                                                $"Thời gian  : {DateTime.Now:dd/MM/yyyy HH:mm:ss}\n" +
+                                                $"Khách hàng : {customerName}\n" +
+                                                $"----------------------------------------\n";
+
+                        // Lưu Chi tiết Hóa Đơn & Trừ tồn kho
+                        foreach (var item in posCartItems)
+                        {
+                            // Lấy sản phẩm từ DB để trừ tồn kho
+                            var dbShoe = db.Products.FirstOrDefault(p => p.ProductId == item.ProductId);
+                            if (dbShoe != null)
+                            {
+                                if (dbShoe.StockQuantity < item.Quantity) throw new Exception($"Giày {dbShoe.Name} không đủ hàng!");
+                                dbShoe.StockQuantity -= item.Quantity; // Trừ tồn kho
+                            }
+
+                            // Lưu vào bảng OrderDetails
+                            db.OrderDetails.Add(new OrderDetail
+                            {
+                                OrderId = newOrder.OrderId,
+                                ProductId = item.ProductId,
+                                Quantity = item.Quantity,
+                                UnitPrice = item.UnitPrice
+                            });
+
+                            // Cộng chuỗi in
+                            invoiceContent += $"• {item.ProductName}\n" +
+                                              $"  Đơn giá: {item.UnitPrice:N0} VNĐ x {item.Quantity} = {item.TotalPrice:N0} VNĐ\n";
+                        }
+
+                        db.SaveChanges(); // Lưu tất cả thay đổi
+                        transaction.Commit(); // Chốt giao dịch an toàn
+
+                        // Hoàn thiện chuỗi in hóa đơn
+                        invoiceContent += $"----------------------------------------\n" +
+                                          $"Tổng tiền hàng: {subTotal:N0} VNĐ\n" +
+                                          $"Chiết khấu    : -{discount:N0} VNĐ\n" +
+                                          $"TỔNG THANH TOÁN: {grandTotal:N0} VNĐ\n" +
+                                          $"Tiền khách đưa : {customerMoney:N0} VNĐ\n" +
+                                          $"Tiền thừa trả  : {(customerMoney - grandTotal):N0} VNĐ\n" +
+                                          $"----------------------------------------\n" +
+                                          (selectedCustomer != null ? $"🎁 Tích lũy thêm: +{earnedPoints} Điểm\n" : "") +
+                                          $"========================================\n" +
+                                          $"Cảm ơn quý khách và hẹn gặp lại!\n";
+
+                        // Hiển thị Preview
+                        string fileName = $"HoaDon_POS_{invoiceCode}.txt";
+                        using (FormInvoicePreview previewForm = new FormInvoicePreview("Hóa Đơn Bán Hàng POS", invoiceContent, fileName))
+                        {
+                            previewForm.ShowDialog(this);
+                        }
+
+                        // Dọn dẹp UI sau khi bán xong
+                        posCartItems.Clear();
+                        numDiscount.Value = 0;
+                        numCustomerMoney.Value = 0;
+                        UpdateCartGrid();
+                        LoadShoeGrid(); // Gọi lại hàm của bạn để load tồn kho mới
+                        UpdatePOSCalculations();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        string errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                        MessageBox.Show("Lỗi chi tiết từ SQL: " + errorMsg, "Lỗi Thanh Toán", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
         }
     }
 }
