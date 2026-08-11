@@ -70,8 +70,9 @@ namespace LTWIN.Forms
             panelLeft.Controls.Add(panelShoeFilter);
             panelLeft.Dock = DockStyle.Fill;
             panelLeft.Location = new Point(0, 0);
+            panelLeft.Margin = new Padding(3, 4, 3, 4);
             panelLeft.Name = "panelLeft";
-            panelLeft.Size = new Size(540, 580);
+            panelLeft.Size = new Size(617, 773);
             panelLeft.TabIndex = 0;
             // 
             // dgvShoesList
@@ -83,16 +84,19 @@ namespace LTWIN.Forms
             dgvShoesList.BorderStyle = BorderStyle.None;
             dgvShoesList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvShoesList.Dock = DockStyle.Fill;
-            dgvShoesList.Location = new Point(0, 60);
+            dgvShoesList.Location = new Point(0, 80);
+            dgvShoesList.Margin = new Padding(3, 4, 3, 4);
             dgvShoesList.MultiSelect = false;
             dgvShoesList.Name = "dgvShoesList";
             dgvShoesList.ReadOnly = true;
             dgvShoesList.RowHeadersVisible = false;
+            dgvShoesList.RowHeadersWidth = 51;
             dgvShoesList.RowTemplate.Height = 35;
             dgvShoesList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvShoesList.Size = new Size(540, 520);
+            dgvShoesList.Size = new Size(617, 693);
             dgvShoesList.TabIndex = 1;
             dgvShoesList.CellContentClick += dgvShoesList_CellContentClick;
+            dgvShoesList.CellDoubleClick += dgvShoesList_CellDoubleClick;
             // 
             // panelShoeFilter
             // 
@@ -102,9 +106,10 @@ namespace LTWIN.Forms
             panelShoeFilter.Controls.Add(cmbCategoryFilter);
             panelShoeFilter.Dock = DockStyle.Top;
             panelShoeFilter.Location = new Point(0, 0);
+            panelShoeFilter.Margin = new Padding(3, 4, 3, 4);
             panelShoeFilter.Name = "panelShoeFilter";
-            panelShoeFilter.Padding = new Padding(12);
-            panelShoeFilter.Size = new Size(540, 60);
+            panelShoeFilter.Padding = new Padding(14, 16, 14, 16);
+            panelShoeFilter.Size = new Size(617, 80);
             panelShoeFilter.TabIndex = 0;
             // 
             // btnSearchShoe
@@ -114,9 +119,10 @@ namespace LTWIN.Forms
             btnSearchShoe.FlatStyle = FlatStyle.Flat;
             btnSearchShoe.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnSearchShoe.ForeColor = Color.White;
-            btnSearchShoe.Location = new Point(440, 15);
+            btnSearchShoe.Location = new Point(503, 20);
+            btnSearchShoe.Margin = new Padding(3, 4, 3, 4);
             btnSearchShoe.Name = "btnSearchShoe";
-            btnSearchShoe.Size = new Size(85, 30);
+            btnSearchShoe.Size = new Size(97, 40);
             btnSearchShoe.TabIndex = 2;
             btnSearchShoe.Text = "🔍 Tìm";
             btnSearchShoe.UseVisualStyleBackColor = false;
@@ -125,10 +131,11 @@ namespace LTWIN.Forms
             // txtSearchShoe
             // 
             txtSearchShoe.Font = new Font("Segoe UI", 9.5F);
-            txtSearchShoe.Location = new Point(190, 18);
+            txtSearchShoe.Location = new Point(217, 24);
+            txtSearchShoe.Margin = new Padding(3, 4, 3, 4);
             txtSearchShoe.Name = "txtSearchShoe";
             txtSearchShoe.PlaceholderText = "Nhập tên giày cần chọn...";
-            txtSearchShoe.Size = new Size(240, 24);
+            txtSearchShoe.Size = new Size(274, 29);
             txtSearchShoe.TabIndex = 1;
             // 
             // cmbCategoryFilter
@@ -136,9 +143,10 @@ namespace LTWIN.Forms
             cmbCategoryFilter.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbCategoryFilter.Font = new Font("Segoe UI", 9.5F);
             cmbCategoryFilter.FormattingEnabled = true;
-            cmbCategoryFilter.Location = new Point(12, 17);
+            cmbCategoryFilter.Location = new Point(14, 23);
+            cmbCategoryFilter.Margin = new Padding(3, 4, 3, 4);
             cmbCategoryFilter.Name = "cmbCategoryFilter";
-            cmbCategoryFilter.Size = new Size(165, 25);
+            cmbCategoryFilter.Size = new Size(188, 29);
             cmbCategoryFilter.TabIndex = 0;
             cmbCategoryFilter.SelectedIndexChanged += cmbCategoryFilter_SelectedIndexChanged;
             // 
@@ -149,9 +157,10 @@ namespace LTWIN.Forms
             panelRightCart.Controls.Add(panelPaymentSummary);
             panelRightCart.Controls.Add(panelCustomerHeader);
             panelRightCart.Dock = DockStyle.Right;
-            panelRightCart.Location = new Point(540, 0);
+            panelRightCart.Location = new Point(617, 0);
+            panelRightCart.Margin = new Padding(3, 4, 3, 4);
             panelRightCart.Name = "panelRightCart";
-            panelRightCart.Size = new Size(480, 580);
+            panelRightCart.Size = new Size(549, 773);
             panelRightCart.TabIndex = 1;
             // 
             // dgvCartList
@@ -163,13 +172,15 @@ namespace LTWIN.Forms
             dgvCartList.BorderStyle = BorderStyle.None;
             dgvCartList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvCartList.Dock = DockStyle.Fill;
-            dgvCartList.Location = new Point(0, 60);
+            dgvCartList.Location = new Point(0, 80);
+            dgvCartList.Margin = new Padding(3, 4, 3, 4);
             dgvCartList.MultiSelect = false;
             dgvCartList.Name = "dgvCartList";
             dgvCartList.RowHeadersVisible = false;
+            dgvCartList.RowHeadersWidth = 51;
             dgvCartList.RowTemplate.Height = 32;
             dgvCartList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvCartList.Size = new Size(480, 250);
+            dgvCartList.Size = new Size(549, 333);
             dgvCartList.TabIndex = 1;
             dgvCartList.CellContentClick += dgvCartList_CellContentClick;
             // 
@@ -189,10 +200,11 @@ namespace LTWIN.Forms
             panelPaymentSummary.Controls.Add(lblSubTotal);
             panelPaymentSummary.Controls.Add(lblSubTotalTitle);
             panelPaymentSummary.Dock = DockStyle.Bottom;
-            panelPaymentSummary.Location = new Point(0, 310);
+            panelPaymentSummary.Location = new Point(0, 413);
+            panelPaymentSummary.Margin = new Padding(3, 4, 3, 4);
             panelPaymentSummary.Name = "panelPaymentSummary";
-            panelPaymentSummary.Padding = new Padding(15);
-            panelPaymentSummary.Size = new Size(480, 270);
+            panelPaymentSummary.Padding = new Padding(17, 20, 17, 20);
+            panelPaymentSummary.Size = new Size(549, 360);
             panelPaymentSummary.TabIndex = 2;
             // 
             // btnCompletePayment
@@ -202,9 +214,10 @@ namespace LTWIN.Forms
             btnCompletePayment.FlatStyle = FlatStyle.Flat;
             btnCompletePayment.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             btnCompletePayment.ForeColor = Color.White;
-            btnCompletePayment.Location = new Point(145, 205);
+            btnCompletePayment.Location = new Point(166, 273);
+            btnCompletePayment.Margin = new Padding(3, 4, 3, 4);
             btnCompletePayment.Name = "btnCompletePayment";
-            btnCompletePayment.Size = new Size(320, 50);
+            btnCompletePayment.Size = new Size(366, 67);
             btnCompletePayment.TabIndex = 11;
             btnCompletePayment.Text = "💳 THANH TOÁN && IN HÓA ĐƠN";
             btnCompletePayment.UseVisualStyleBackColor = false;
@@ -217,9 +230,10 @@ namespace LTWIN.Forms
             btnClearCart.FlatStyle = FlatStyle.Flat;
             btnClearCart.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btnClearCart.ForeColor = Color.White;
-            btnClearCart.Location = new Point(15, 205);
+            btnClearCart.Location = new Point(17, 273);
+            btnClearCart.Margin = new Padding(3, 4, 3, 4);
             btnClearCart.Name = "btnClearCart";
-            btnClearCart.Size = new Size(120, 50);
+            btnClearCart.Size = new Size(137, 67);
             btnClearCart.TabIndex = 10;
             btnClearCart.Text = "🗑️ Hủy Giỏ";
             btnClearCart.UseVisualStyleBackColor = false;
@@ -230,9 +244,9 @@ namespace LTWIN.Forms
             lblChangeMoney.AutoSize = true;
             lblChangeMoney.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblChangeMoney.ForeColor = Color.FromArgb(46, 213, 115);
-            lblChangeMoney.Location = new Point(180, 160);
+            lblChangeMoney.Location = new Point(206, 213);
             lblChangeMoney.Name = "lblChangeMoney";
-            lblChangeMoney.Size = new Size(57, 21);
+            lblChangeMoney.Size = new Size(74, 28);
             lblChangeMoney.TabIndex = 9;
             lblChangeMoney.Text = "0 VNĐ";
             // 
@@ -240,9 +254,9 @@ namespace LTWIN.Forms
             // 
             lblChangeTitle.AutoSize = true;
             lblChangeTitle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            lblChangeTitle.Location = new Point(15, 162);
+            lblChangeTitle.Location = new Point(17, 216);
             lblChangeTitle.Name = "lblChangeTitle";
-            lblChangeTitle.Size = new Size(129, 17);
+            lblChangeTitle.Size = new Size(168, 21);
             lblChangeTitle.TabIndex = 8;
             lblChangeTitle.Text = "Tiền Thừa Trả Khách:";
             // 
@@ -250,10 +264,11 @@ namespace LTWIN.Forms
             // 
             numCustomerMoney.Font = new Font("Segoe UI", 10F);
             numCustomerMoney.Increment = new decimal(new int[] { 50000, 0, 0, 0 });
-            numCustomerMoney.Location = new Point(180, 122);
+            numCustomerMoney.Location = new Point(206, 163);
+            numCustomerMoney.Margin = new Padding(3, 4, 3, 4);
             numCustomerMoney.Maximum = new decimal(new int[] { 100000000, 0, 0, 0 });
             numCustomerMoney.Name = "numCustomerMoney";
-            numCustomerMoney.Size = new Size(285, 25);
+            numCustomerMoney.Size = new Size(326, 30);
             numCustomerMoney.TabIndex = 7;
             numCustomerMoney.ValueChanged += numCustomerMoney_ValueChanged;
             // 
@@ -261,9 +276,9 @@ namespace LTWIN.Forms
             // 
             lblCustomerMoneyTitle.AutoSize = true;
             lblCustomerMoneyTitle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            lblCustomerMoneyTitle.Location = new Point(15, 124);
+            lblCustomerMoneyTitle.Location = new Point(17, 165);
             lblCustomerMoneyTitle.Name = "lblCustomerMoneyTitle";
-            lblCustomerMoneyTitle.Size = new Size(111, 17);
+            lblCustomerMoneyTitle.Size = new Size(134, 21);
             lblCustomerMoneyTitle.TabIndex = 6;
             lblCustomerMoneyTitle.Text = "Tiền Khách Đưa:";
             // 
@@ -272,9 +287,9 @@ namespace LTWIN.Forms
             lblGrandTotal.AutoSize = true;
             lblGrandTotal.Font = new Font("Segoe UI", 15F, FontStyle.Bold);
             lblGrandTotal.ForeColor = Color.FromArgb(255, 71, 87);
-            lblGrandTotal.Location = new Point(180, 80);
+            lblGrandTotal.Location = new Point(206, 107);
             lblGrandTotal.Name = "lblGrandTotal";
-            lblGrandTotal.Size = new Size(74, 28);
+            lblGrandTotal.Size = new Size(91, 35);
             lblGrandTotal.TabIndex = 5;
             lblGrandTotal.Text = "0 VNĐ";
             // 
@@ -282,9 +297,9 @@ namespace LTWIN.Forms
             // 
             lblGrandTotalTitle.AutoSize = true;
             lblGrandTotalTitle.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
-            lblGrandTotalTitle.Location = new Point(15, 85);
+            lblGrandTotalTitle.Location = new Point(17, 113);
             lblGrandTotalTitle.Name = "lblGrandTotalTitle";
-            lblGrandTotalTitle.Size = new Size(160, 19);
+            lblGrandTotalTitle.Size = new Size(208, 25);
             lblGrandTotalTitle.TabIndex = 4;
             lblGrandTotalTitle.Text = "Tổng Tiền Thanh Toán:";
             // 
@@ -292,10 +307,11 @@ namespace LTWIN.Forms
             // 
             numDiscount.Font = new Font("Segoe UI", 9.5F);
             numDiscount.Increment = new decimal(new int[] { 10000, 0, 0, 0 });
-            numDiscount.Location = new Point(180, 48);
+            numDiscount.Location = new Point(206, 64);
+            numDiscount.Margin = new Padding(3, 4, 3, 4);
             numDiscount.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
             numDiscount.Name = "numDiscount";
-            numDiscount.Size = new Size(285, 24);
+            numDiscount.Size = new Size(326, 29);
             numDiscount.TabIndex = 3;
             numDiscount.ValueChanged += numDiscount_ValueChanged;
             // 
@@ -303,9 +319,9 @@ namespace LTWIN.Forms
             // 
             lblDiscountTitle.AutoSize = true;
             lblDiscountTitle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            lblDiscountTitle.Location = new Point(15, 50);
+            lblDiscountTitle.Location = new Point(17, 67);
             lblDiscountTitle.Name = "lblDiscountTitle";
-            lblDiscountTitle.Size = new Size(140, 17);
+            lblDiscountTitle.Size = new Size(181, 21);
             lblDiscountTitle.TabIndex = 2;
             lblDiscountTitle.Text = "Giảm Giá / Chiết Khấu:";
             // 
@@ -313,9 +329,9 @@ namespace LTWIN.Forms
             // 
             lblSubTotal.AutoSize = true;
             lblSubTotal.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
-            lblSubTotal.Location = new Point(180, 18);
+            lblSubTotal.Location = new Point(206, 24);
             lblSubTotal.Name = "lblSubTotal";
-            lblSubTotal.Size = new Size(52, 19);
+            lblSubTotal.Size = new Size(66, 25);
             lblSubTotal.TabIndex = 1;
             lblSubTotal.Text = "0 VNĐ";
             // 
@@ -323,9 +339,9 @@ namespace LTWIN.Forms
             // 
             lblSubTotalTitle.AutoSize = true;
             lblSubTotalTitle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            lblSubTotalTitle.Location = new Point(15, 18);
+            lblSubTotalTitle.Location = new Point(17, 24);
             lblSubTotalTitle.Name = "lblSubTotalTitle";
-            lblSubTotalTitle.Size = new Size(111, 17);
+            lblSubTotalTitle.Size = new Size(135, 21);
             lblSubTotalTitle.TabIndex = 0;
             lblSubTotalTitle.Text = "Tổng Tiền Hàng:";
             // 
@@ -337,9 +353,10 @@ namespace LTWIN.Forms
             panelCustomerHeader.Controls.Add(lblPOSHeader);
             panelCustomerHeader.Dock = DockStyle.Top;
             panelCustomerHeader.Location = new Point(0, 0);
+            panelCustomerHeader.Margin = new Padding(3, 4, 3, 4);
             panelCustomerHeader.Name = "panelCustomerHeader";
-            panelCustomerHeader.Padding = new Padding(12);
-            panelCustomerHeader.Size = new Size(480, 60);
+            panelCustomerHeader.Padding = new Padding(14, 16, 14, 16);
+            panelCustomerHeader.Size = new Size(549, 80);
             panelCustomerHeader.TabIndex = 0;
             // 
             // cmbCustomer
@@ -347,18 +364,19 @@ namespace LTWIN.Forms
             cmbCustomer.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbCustomer.Font = new Font("Segoe UI", 9F);
             cmbCustomer.FormattingEnabled = true;
-            cmbCustomer.Location = new Point(235, 17);
+            cmbCustomer.Location = new Point(269, 23);
+            cmbCustomer.Margin = new Padding(3, 4, 3, 4);
             cmbCustomer.Name = "cmbCustomer";
-            cmbCustomer.Size = new Size(230, 23);
+            cmbCustomer.Size = new Size(262, 28);
             cmbCustomer.TabIndex = 2;
             // 
             // lblCustomerTitle
             // 
             lblCustomerTitle.AutoSize = true;
             lblCustomerTitle.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
-            lblCustomerTitle.Location = new Point(155, 21);
+            lblCustomerTitle.Location = new Point(177, 28);
             lblCustomerTitle.Name = "lblCustomerTitle";
-            lblCustomerTitle.Size = new Size(76, 15);
+            lblCustomerTitle.Size = new Size(97, 20);
             lblCustomerTitle.TabIndex = 1;
             lblCustomerTitle.Text = "Khách Hàng:";
             // 
@@ -367,19 +385,20 @@ namespace LTWIN.Forms
             lblPOSHeader.AutoSize = true;
             lblPOSHeader.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             lblPOSHeader.ForeColor = Color.FromArgb(47, 53, 66);
-            lblPOSHeader.Location = new Point(12, 18);
+            lblPOSHeader.Location = new Point(14, 24);
             lblPOSHeader.Name = "lblPOSHeader";
-            lblPOSHeader.Size = new Size(130, 20);
+            lblPOSHeader.Size = new Size(177, 25);
             lblPOSHeader.TabIndex = 0;
-            lblPOSHeader.Text = "🛒 GIỎ HÀNG POS";
+            lblPOSHeader.Text = "\U0001f6d2 GIỎ HÀNG POS";
             // 
             // FormPOS
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1020, 580);
+            ClientSize = new Size(1166, 773);
             Controls.Add(panelLeft);
             Controls.Add(panelRightCart);
+            Margin = new Padding(3, 4, 3, 4);
             Name = "FormPOS";
             Text = "Màn Hình Bán Hàng POS";
             Load += FormPOS_Load;

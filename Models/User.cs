@@ -16,4 +16,5 @@ public partial class User
     public string? Role { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public int RewardPoints { get; set; }
 }
