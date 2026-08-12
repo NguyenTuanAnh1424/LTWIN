@@ -135,6 +135,9 @@ namespace LTWIN.Forms
                 }).ToList();
 
                 dgvTopSelling.DataSource = displayData;
+
+                panelChartCanvas.Invalidate();
+
             }
         }
 
@@ -186,6 +189,74 @@ namespace LTWIN.Forms
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi xuất file báo cáo: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void panelChartCanvas_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            int width = panelChartCanvas.Width;
+            int height = panelChartCanvas.Height;
+
+            // Xóa nền trắng sạch sẽ
+            g.Clear(Color.White);
+
+            // Kiểm tra nếu chưa có dữ liệu biểu đồ
+            if (topSellingList == null || topSellingList.Count == 0)
+            {
+                using (Font font = new Font("Segoe UI", 11, FontStyle.Regular))
+                {
+                    using (Brush brush = new SolidBrush(Color.Gray))
+                    {
+                        g.DrawString("Chưa có dữ liệu biểu đồ doanh thu", font, brush, new PointF(30, height / 2 - 10));
+                    }
+                }
+                return;
+            }
+
+            // Thiết lập thông số hiển thị
+            int paddingLeft = 50;
+            int paddingBottom = 40;
+            int paddingTop = 30;
+            int availableWidth = width - paddingLeft - 30;
+
+            int count = topSellingList.Count;
+            int barWidth = Math.Max(35, availableWidth / (count * 2));
+            int spacing = (availableWidth - (barWidth * count)) / Math.Max(1, count + 1);
+
+            decimal maxRevenue = topSellingList.Max(x => x.TotalRevenue);
+            if (maxRevenue <= 0) maxRevenue = 1000000; // Tránh chia cho 0
+
+            int chartHeight = height - paddingBottom - paddingTop;
+
+            for (int i = 0; i < count; i++)
+            {
+                var item = topSellingList[i];
+
+                // Tính chiều cao cột theo tỷ lệ doanh thu thực tế
+                int barHeight = (int)((item.TotalRevenue / (decimal)maxRevenue) * chartHeight);
+                if (barHeight < 15) barHeight = 15; // Đảm bảo cột tối thiểu luôn hiển thị
+
+                // Tính tọa độ X, Y chuẩn xác nằm gọn trong khung panel
+                int x = paddingLeft + spacing + i * (barWidth + spacing);
+                int y = height - paddingBottom - barHeight;
+
+                // Vẽ cột hình chữ nhật với màu gradient Indigo đẹp mắt
+                using (System.Drawing.Drawing2D.LinearGradientBrush brush = new System.Drawing.Drawing2D.LinearGradientBrush(
+                    new Rectangle(x, y, barWidth, barHeight), Color.FromArgb(79, 70, 229), Color.FromArgb(99, 102, 241), 90f))
+                {
+                    g.FillRectangle(brush, x, y, barWidth, barHeight);
+                }
+
+                // Vẽ nhãn tên (Top 1, Top 2...) bên dưới cột
+                using (Font font = new Font("Segoe UI", 9, FontStyle.Bold))
+                {
+                    string label = $"Top {item.Rank}";
+                    SizeF textSize = g.MeasureString(label, font);
+                    float textX = x + (barWidth - textSize.Width) / 2;
+                    g.DrawString(label, font, Brushes.DarkSlateGray, new PointF(textX, height - paddingBottom + 8));
+                }
             }
         }
     }

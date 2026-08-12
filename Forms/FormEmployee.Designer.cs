@@ -53,27 +53,27 @@
             dgvEmployees.Location = new Point(12, 57);
             dgvEmployees.Name = "dgvEmployees";
             dgvEmployees.RowHeadersWidth = 51;
-            dgvEmployees.Size = new Size(371, 328);
+            dgvEmployees.Size = new Size(682, 337);
             dgvEmployees.TabIndex = 0;
             dgvEmployees.CellClick += dgvEmployees_CellClick;
             // 
             // txtFullName
             // 
-            txtFullName.Location = new Point(555, 71);
+            txtFullName.Location = new Point(907, 61);
             txtFullName.Name = "txtFullName";
             txtFullName.Size = new Size(216, 27);
             txtFullName.TabIndex = 1;
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(555, 114);
+            txtPassword.Location = new Point(907, 105);
             txtPassword.Name = "txtPassword";
             txtPassword.Size = new Size(216, 27);
             txtPassword.TabIndex = 2;
             // 
             // txtPhoneNumber
             // 
-            txtPhoneNumber.Location = new Point(555, 163);
+            txtPhoneNumber.Location = new Point(907, 163);
             txtPhoneNumber.Name = "txtPhoneNumber";
             txtPhoneNumber.Size = new Size(216, 27);
             txtPhoneNumber.TabIndex = 3;
@@ -83,14 +83,14 @@
             cmbRole.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbRole.FormattingEnabled = true;
             cmbRole.Items.AddRange(new object[] { "Admin", "Employee" });
-            cmbRole.Location = new Point(555, 218);
+            cmbRole.Location = new Point(907, 218);
             cmbRole.Name = "cmbRole";
             cmbRole.Size = new Size(216, 28);
             cmbRole.TabIndex = 4;
             // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(438, 298);
+            btnAdd.Location = new Point(791, 298);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(154, 44);
             btnAdd.TabIndex = 5;
@@ -100,7 +100,7 @@
             // 
             // btnEdit
             // 
-            btnEdit.Location = new Point(609, 298);
+            btnEdit.Location = new Point(1047, 298);
             btnEdit.Name = "btnEdit";
             btnEdit.Size = new Size(117, 44);
             btnEdit.TabIndex = 6;
@@ -110,7 +110,7 @@
             // 
             // btnDelete
             // 
-            btnDelete.Location = new Point(438, 363);
+            btnDelete.Location = new Point(792, 391);
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(153, 44);
             btnDelete.TabIndex = 7;
@@ -124,7 +124,7 @@
             label1.BackColor = SystemColors.Control;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label1.ForeColor = SystemColors.ActiveCaptionText;
-            label1.Location = new Point(402, 75);
+            label1.Location = new Point(720, 57);
             label1.Name = "label1";
             label1.Size = new Size(149, 28);
             label1.TabIndex = 8;
@@ -134,7 +134,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label2.Location = new Point(403, 114);
+            label2.Location = new Point(720, 105);
             label2.Name = "label2";
             label2.Size = new Size(103, 28);
             label2.TabIndex = 9;
@@ -144,7 +144,7 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label3.Location = new Point(403, 159);
+            label3.Location = new Point(720, 163);
             label3.Name = "label3";
             label3.Size = new Size(137, 28);
             label3.TabIndex = 10;
@@ -154,7 +154,7 @@
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label4.Location = new Point(403, 214);
+            label4.Location = new Point(720, 218);
             label4.Name = "label4";
             label4.Size = new Size(115, 28);
             label4.TabIndex = 11;
@@ -167,7 +167,7 @@
             label5.FlatStyle = FlatStyle.Flat;
             label5.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label5.ForeColor = SystemColors.ControlLightLight;
-            label5.Location = new Point(471, 22);
+            label5.Location = new Point(812, 15);
             label5.Name = "label5";
             label5.Size = new Size(243, 28);
             label5.TabIndex = 12;
@@ -193,7 +193,7 @@
             // 
             // btnClear
             // 
-            btnClear.Location = new Point(609, 363);
+            btnClear.Location = new Point(1047, 391);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(117, 44);
             btnClear.TabIndex = 15;
@@ -205,7 +205,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1330, 605);
             Controls.Add(btnClear);
             Controls.Add(txtSearch);
             Controls.Add(btnSearch);
