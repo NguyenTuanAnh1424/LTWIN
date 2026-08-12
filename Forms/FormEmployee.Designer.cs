@@ -29,94 +29,102 @@
         private void InitializeComponent()
         {
             dgvEmployees = new DataGridView();
-            txtUsername = new TextBox();
-            txtPassword = new TextBox();
             txtFullName = new TextBox();
-            cbRole = new ComboBox();
+            txtPassword = new TextBox();
+            txtPhoneNumber = new TextBox();
+            cmbRole = new ComboBox();
             btnAdd = new Button();
-            btnUpdate = new Button();
+            btnEdit = new Button();
             btnDelete = new Button();
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
+            label5 = new Label();
+            btnSearch = new Button();
+            txtSearch = new TextBox();
+            btnClear = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvEmployees).BeginInit();
             SuspendLayout();
             // 
             // dgvEmployees
             // 
             dgvEmployees.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvEmployees.Location = new Point(32, 118);
+            dgvEmployees.Location = new Point(12, 57);
             dgvEmployees.Name = "dgvEmployees";
             dgvEmployees.RowHeadersWidth = 51;
-            dgvEmployees.Size = new Size(756, 206);
+            dgvEmployees.Size = new Size(371, 328);
             dgvEmployees.TabIndex = 0;
+            dgvEmployees.CellClick += dgvEmployees_CellClick;
             // 
-            // txtUsername
+            // txtFullName
             // 
-            txtUsername.Location = new Point(187, 13);
-            txtUsername.Name = "txtUsername";
-            txtUsername.Size = new Size(216, 27);
-            txtUsername.TabIndex = 1;
+            txtFullName.Location = new Point(555, 71);
+            txtFullName.Name = "txtFullName";
+            txtFullName.Size = new Size(216, 27);
+            txtFullName.TabIndex = 1;
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(187, 55);
+            txtPassword.Location = new Point(555, 114);
             txtPassword.Name = "txtPassword";
             txtPassword.Size = new Size(216, 27);
             txtPassword.TabIndex = 2;
             // 
-            // txtFullName
+            // txtPhoneNumber
             // 
-            txtFullName.Location = new Point(555, 17);
-            txtFullName.Name = "txtFullName";
-            txtFullName.Size = new Size(216, 27);
-            txtFullName.TabIndex = 3;
+            txtPhoneNumber.Location = new Point(555, 163);
+            txtPhoneNumber.Name = "txtPhoneNumber";
+            txtPhoneNumber.Size = new Size(216, 27);
+            txtPhoneNumber.TabIndex = 3;
             // 
-            // cbRole
+            // cmbRole
             // 
-            cbRole.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbRole.FormattingEnabled = true;
-            cbRole.Items.AddRange(new object[] { "Admin", "Employee" });
-            cbRole.Location = new Point(555, 59);
-            cbRole.Name = "cbRole";
-            cbRole.Size = new Size(216, 28);
-            cbRole.TabIndex = 4;
+            cmbRole.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbRole.FormattingEnabled = true;
+            cmbRole.Items.AddRange(new object[] { "Admin", "Employee" });
+            cmbRole.Location = new Point(555, 218);
+            cmbRole.Name = "cmbRole";
+            cmbRole.Size = new Size(216, 28);
+            cmbRole.TabIndex = 4;
             // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(104, 351);
+            btnAdd.Location = new Point(438, 298);
             btnAdd.Name = "btnAdd";
-            btnAdd.Size = new Size(116, 44);
+            btnAdd.Size = new Size(154, 44);
             btnAdd.TabIndex = 5;
-            btnAdd.Text = "Thêm";
+            btnAdd.Text = "+ Thêm Nhân Viên";
             btnAdd.UseVisualStyleBackColor = true;
+            btnAdd.Click += btnAdd_Click;
             // 
-            // btnUpdate
+            // btnEdit
             // 
-            btnUpdate.Location = new Point(335, 351);
-            btnUpdate.Name = "btnUpdate";
-            btnUpdate.Size = new Size(117, 44);
-            btnUpdate.TabIndex = 6;
-            btnUpdate.Text = "Sửa";
-            btnUpdate.UseVisualStyleBackColor = true;
-            btnUpdate.Click += btnUpdate_Click;
+            btnEdit.Location = new Point(609, 298);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(117, 44);
+            btnEdit.TabIndex = 6;
+            btnEdit.Text = "✏️ Cập Nhật";
+            btnEdit.UseVisualStyleBackColor = true;
+            btnEdit.Click += btnEdit_Click;
             // 
             // btnDelete
             // 
-            btnDelete.Location = new Point(563, 351);
+            btnDelete.Location = new Point(438, 363);
             btnDelete.Name = "btnDelete";
-            btnDelete.Size = new Size(116, 44);
+            btnDelete.Size = new Size(153, 44);
             btnDelete.TabIndex = 7;
-            btnDelete.Text = "Xóa";
+            btnDelete.Text = "🗑️ Xóa";
             btnDelete.UseVisualStyleBackColor = true;
             btnDelete.Click += btnDelete_Click;
             // 
             // label1
             // 
             label1.AutoSize = true;
+            label1.BackColor = SystemColors.Control;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label1.Location = new Point(32, 12);
+            label1.ForeColor = SystemColors.ActiveCaptionText;
+            label1.Location = new Point(402, 75);
             label1.Name = "label1";
             label1.Size = new Size(149, 28);
             label1.TabIndex = 8;
@@ -126,7 +134,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label2.Location = new Point(32, 51);
+            label2.Location = new Point(403, 114);
             label2.Name = "label2";
             label2.Size = new Size(103, 28);
             label2.TabIndex = 9;
@@ -136,38 +144,83 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label3.Location = new Point(423, 13);
+            label3.Location = new Point(403, 159);
             label3.Name = "label3";
-            label3.Size = new Size(80, 28);
+            label3.Size = new Size(137, 28);
             label3.TabIndex = 10;
-            label3.Text = "Họ tên :";
+            label3.Text = "Số điện thoại :";
             // 
             // label4
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label4.Location = new Point(423, 55);
+            label4.Location = new Point(403, 214);
             label4.Name = "label4";
             label4.Size = new Size(115, 28);
             label4.TabIndex = 11;
             label4.Text = "Quyền hạn :";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.BackColor = Color.DodgerBlue;
+            label5.FlatStyle = FlatStyle.Flat;
+            label5.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label5.ForeColor = SystemColors.ControlLightLight;
+            label5.Location = new Point(471, 22);
+            label5.Name = "label5";
+            label5.Size = new Size(243, 28);
+            label5.TabIndex = 12;
+            label5.Text = "THÔNG TIN NHÂN VIÊN";
+            // 
+            // btnSearch
+            // 
+            btnSearch.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnSearch.Location = new Point(44, 12);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(79, 30);
+            btnSearch.TabIndex = 13;
+            btnSearch.Text = "🔍 Tìm";
+            btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
+            // 
+            // txtSearch
+            // 
+            txtSearch.Location = new Point(139, 15);
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(125, 27);
+            txtSearch.TabIndex = 14;
+            // 
+            // btnClear
+            // 
+            btnClear.Location = new Point(609, 363);
+            btnClear.Name = "btnClear";
+            btnClear.Size = new Size(117, 44);
+            btnClear.TabIndex = 15;
+            btnClear.Text = "🔄 Làm Mới";
+            btnClear.UseVisualStyleBackColor = true;
+            btnClear.Click += btnClear_Click;
             // 
             // FormEmployee
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnClear);
+            Controls.Add(txtSearch);
+            Controls.Add(btnSearch);
+            Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(btnDelete);
-            Controls.Add(btnUpdate);
+            Controls.Add(btnEdit);
             Controls.Add(btnAdd);
-            Controls.Add(cbRole);
-            Controls.Add(txtFullName);
+            Controls.Add(cmbRole);
+            Controls.Add(txtPhoneNumber);
             Controls.Add(txtPassword);
-            Controls.Add(txtUsername);
+            Controls.Add(txtFullName);
             Controls.Add(dgvEmployees);
             Name = "FormEmployee";
             Text = "Quản Lý Nhân Viên & Tài Khoản";
@@ -179,16 +232,20 @@
         #endregion
 
         private DataGridView dgvEmployees;
-        private TextBox txtUsername;
-        private TextBox txtPassword;
         private TextBox txtFullName;
-        private ComboBox cbRole;
+        private TextBox txtPassword;
+        private TextBox txtPhoneNumber;
+        private ComboBox cmbRole;
         private Button btnAdd;
-        private Button btnUpdate;
+        private Button btnEdit;
         private Button btnDelete;
         private Label label1;
         private Label label2;
         private Label label3;
         private Label label4;
+        private Label label5;
+        private Button btnSearch;
+        private TextBox txtSearch;
+        private Button btnClear;
     }
 }

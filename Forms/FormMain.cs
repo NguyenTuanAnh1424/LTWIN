@@ -6,8 +6,8 @@ using LTWIN.Models;
 namespace LTWIN.Forms
 {
     /// <summary>
-    /// MÀN HÌNH CHÍNH CỦA ỨNG DỤNG WINDOWS FORMS (FORMMAIN.CS)
-    /// Đã tích hợp Màn Hình Bán Hàng POS, Quản Lý Khách Hàng & Điểm Tích Lũy, Quản Lý Sản Phẩm kèm Xem Ảnh.
+    /// MÀN HÌNH CHÍNH ỨNG DỤNG (FORMMAIN.CS)
+    /// Điều hướng toàn bộ các chức năng hệ thống và phân quyền theo Role thực tế từ SQL Server.
     /// </summary>
     public partial class FormMain : Form
     {
@@ -16,16 +16,18 @@ namespace LTWIN.Forms
 
         public bool IsLoggingOut { get; private set; } = false;
 
+        // Constructor mặc định (dùng cho Designer)
         public FormMain()
         {
             InitializeComponent();
-            currentUser = new User { FullName = "Admin Quản Trị", Role = "Admin" };
+            currentUser = new User { FullName = "Quản Trị Viên", Role = "Admin" };
         }
 
+        // Constructor nhận thông tin User đăng nhập thật từ SQL Server
         public FormMain(User user)
         {
             InitializeComponent();
-            currentUser = user ?? new User { FullName = "Khách Hàng", Role = "Employee" };
+            currentUser = user ?? new User { FullName = "Nhân Viên Bán Hàng", Role = "Employee" };
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -33,31 +35,36 @@ namespace LTWIN.Forms
             ApplyRolePermissions();
         }
 
+        // PHÂN QUYỀN HIỂN THỊ MENU THEO ROLE THẬT TỪ CSDL
         private void ApplyRolePermissions()
         {
-            string roleName = currentUser.Role == "Admin" ? "Quản Trị Viên" : "Nhân Viên Bán Hàng";
-            lblUserRole.Text = $"👤 {currentUser.FullName} ({roleName})";
+            string userRole = currentUser.Role ?? "Admin";
+            string roleDisplayName = userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase)
+                                     ? "Quản Trị Viên"
+                                     : "Nhân Viên Bán Hàng";
 
-            if (currentUser.Role.Equals("Employee", StringComparison.OrdinalIgnoreCase))
+            lblUserRole.Text = $"👤 {currentUser.FullName ?? "Người Dùng"} ({roleDisplayName})";
+
+            if (userRole.Equals("Employee", StringComparison.OrdinalIgnoreCase))
             {
-                // Nhân viên bán hàng: Ẩn các menu quản lý sản phẩm, danh mục và thống kê báo cáo
+                // Nhân viên: Ẩn các menu Quản lý sản phẩm, Danh mục, Nhân viên & Báo cáo
                 btnProduct.Visible = false;
                 btnCategory.Visible = false;
                 btnReport.Visible = false;
                 btnEmployee.Visible = false;
 
-                // Mở sẵn các menu bán hàng POS, lịch sử hóa đơn, nhập kho và quản lý khách hàng
+                // Hiển thị menu tác nghiệp hàng ngày
                 btnPOS.Visible = true;
                 btnOrderHistory.Visible = true;
                 btnStockImport.Visible = true;
                 btnCustomer.Visible = true;
 
-                // Mặc định mở ngay Màn hình Bán Hàng POS
+                // Mặc định mở ngay màn hình Bán Hàng POS
                 OpenChildForm(new FormPOS(), btnPOS, "MÀN HÌNH BÁN HÀNG POS TẠI QUẦY");
             }
             else
             {
-                // Quản trị viên (Admin): Hiển thị đầy đủ tất cả các menu
+                // Quản trị viên (Admin): Hiển thị đầy đủ tất cả menu
                 btnProduct.Visible = true;
                 btnCategory.Visible = true;
                 btnPOS.Visible = true;
@@ -72,11 +79,13 @@ namespace LTWIN.Forms
             }
         }
 
+        // HÀM MỞ FORM CON TRONG PANEL CHÍNH & DỌN DẸP BỘ NHỚ
         private void OpenChildForm(Form childForm, Button btnSender, string titleText)
         {
             if (activeForm != null)
             {
                 activeForm.Close();
+                activeForm.Dispose(); // Dọn dẹp tài nguyên Form cũ
             }
 
             HighlightSidebarButton(btnSender);
@@ -88,12 +97,14 @@ namespace LTWIN.Forms
             childForm.FormBorderStyle = FormBorderStyle.None;
             childForm.Dock = DockStyle.Fill;
 
+            panelChildForm.Controls.Clear(); // Làm sạch panel trước khi chèn form mới
             panelChildForm.Controls.Add(childForm);
             panelChildForm.Tag = childForm;
             childForm.BringToFront();
             childForm.Show();
         }
 
+        // TỰ ĐỘNG ĐỔI MÀU NÚT SIDEBAR ĐANG ĐƯỢC CHỌN
         private void HighlightSidebarButton(Button activeBtn)
         {
             foreach (Control control in panelSidebar.Controls)
@@ -111,6 +122,8 @@ namespace LTWIN.Forms
                 activeBtn.ForeColor = Color.White;
             }
         }
+
+        // --- CÁC SỰ KIỆN CLICK CHUYỂN MÀN HÌNH ---
 
         private void btnProduct_Click(object sender, EventArgs e)
         {
@@ -147,6 +160,12 @@ namespace LTWIN.Forms
             OpenChildForm(new FormReport(), (Button)sender, "THỐNG KÊ & BÁO CÁO DOANH THU");
         }
 
+        private void btnEmployee_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new FormEmployee(), (Button)sender, "QUẢN LÝ NHÂN VIÊN & TÀI KHOẢN");
+        }
+
+        // ĐĂNG XUẤT TÀI KHOẢN
         private void btnLogout_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -163,6 +182,7 @@ namespace LTWIN.Forms
             }
         }
 
+        // THOÁT ỨNG DỤNG
         private void btnExit_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -177,11 +197,6 @@ namespace LTWIN.Forms
                 IsLoggingOut = false;
                 Application.Exit();
             }
-        }
-
-        private void btnEmployee_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new FormEmployee(), (Button)sender, "QUẢN LÝ NHÂN VIÊN & TÀI KHOẢN");
         }
     }
 }

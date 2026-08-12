@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using LTWIN.Models;
-
 using LTWIN.Utils;
 
 namespace LTWIN.Forms
@@ -12,67 +10,70 @@ namespace LTWIN.Forms
     public partial class FormCustomer : Form
     {
         private int selectedCustomerId = -1;
-        private List<Customer> mockCustomerList;
 
         public FormCustomer()
         {
             InitializeComponent();
-            InitMockCustomers();
         }
 
-        private void InitMockCustomers()
-        {
-            mockCustomerList = new List<Customer>
-            {
-                new Customer { CustomerId = 1, FullName = "Nguyễn Văn Hoàng", PhoneNumber = "0988123456", Email = "hoang.nv@gmail.com", Address = "123 Cầu Giấy, Hà Nội", RewardPoints = 350 },
-                new Customer { CustomerId = 2, FullName = "Trần Thị Thu", PhoneNumber = "0912345678", Email = "thu.tt@gmail.com", Address = "456 Thanh Xuân, Hà Nội", RewardPoints = 120 },
-                new Customer { CustomerId = 3, FullName = "Phạm Minh Đức", PhoneNumber = "0977888999", Email = "duc.pm@gmail.com", Address = "789 Đống Đa, Hà Nội", RewardPoints = 550 },
-                new Customer { CustomerId = 4, FullName = "Lê Hoàng Yến", PhoneNumber = "0905111222", Email = "yen.lh@gmail.com", Address = "12 Ba Đình, Hà Nội", RewardPoints = 45 }
-            };
-        }
-
+        // 1. TẢI DỮ LIỆU TỪ BẢNG dbo.Customers
         private void FormCustomer_Load(object sender, EventArgs e)
         {
             ThemeHelper.StyleDataGridView(dgvCustomers);
             LoadCustomerDataGrid();
         }
 
-        private void LoadCustomerDataGrid(List<Customer> listToDisplay = null)
+        private void LoadCustomerDataGrid()
         {
-            var sourceList = listToDisplay ?? mockCustomerList;
+            string keyword = txtSearch.Text.Trim().ToLower();
 
-            var displayData = sourceList.Select(c => new
+            using (var db = new QlyBanGiayContext())
             {
-                Mã_KH = c.CustomerId,
-                Họ_Và_Tên = c.FullName,
-                Số_Điện_Thoại = c.PhoneNumber,
-                Email = string.IsNullOrEmpty(c.Email) ? "-" : c.Email,
-                Địa_Chỉ = string.IsNullOrEmpty(c.Address) ? "-" : c.Address,
-                Điểm_Tích_Lũy = c.RewardPoints + " Đ",
-                Hạng_Khách_Hàng = c.CustomerTier
-            }).ToList();
+                var query = db.Customers.AsQueryable();
 
-            dgvCustomers.DataSource = displayData;
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(c => c.FullName.ToLower().Contains(keyword) ||
+                                             c.PhoneNumber.Contains(keyword));
+                }
+
+                var displayData = query.Select(c => new
+                {
+                    Mã_KH = c.CustomerId,
+                    Họ_Và_Tên = c.FullName,
+                    Số_Điện_Thoại = c.PhoneNumber,
+                    Email = string.IsNullOrEmpty(c.Email) ? "-" : c.Email,
+                    Địa_Chỉ = string.IsNullOrEmpty(c.Address) ? "-" : c.Address,
+                    Điểm_Tích_Lũy = c.RewardPoints + " Đ"
+                }).ToList();
+
+                dgvCustomers.DataSource = displayData;
+            }
         }
 
+        // 2. CLICK DÒNG TRÊN BẢNG
         private void dgvCustomers_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0 && dgvCustomers.Rows[e.RowIndex].Cells[0].Value != null)
             {
                 selectedCustomerId = Convert.ToInt32(dgvCustomers.Rows[e.RowIndex].Cells["Mã_KH"].Value);
-                var customer = mockCustomerList.FirstOrDefault(c => c.CustomerId == selectedCustomerId);
 
-                if (customer != null)
+                using (var db = new QlyBanGiayContext())
                 {
-                    txtFullName.Text = customer.FullName;
-                    txtPhoneNumber.Text = customer.PhoneNumber;
-                    txtEmail.Text = customer.Email;
-                    txtAddress.Text = customer.Address;
-                    numRewardPoints.Value = customer.RewardPoints;
+                    var customer = db.Customers.FirstOrDefault(c => c.CustomerId == selectedCustomerId);
+                    if (customer != null)
+                    {
+                        txtFullName.Text = customer.FullName;
+                        txtPhoneNumber.Text = customer.PhoneNumber;
+                        txtEmail.Text = customer.Email;
+                        txtAddress.Text = customer.Address;
+                        numRewardPoints.Value = customer.RewardPoints;
+                    }
                 }
             }
         }
 
+        // 3. THÊM KHÁCH HÀNG
         private void btnAdd_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtFullName.Text) || string.IsNullOrWhiteSpace(txtPhoneNumber.Text))
@@ -81,48 +82,64 @@ namespace LTWIN.Forms
                 return;
             }
 
-            int newId = mockCustomerList.Any() ? mockCustomerList.Max(c => c.CustomerId) + 1 : 1;
-
-            var newCustomer = new Customer
+            using (var db = new QlyBanGiayContext())
             {
-                CustomerId = newId,
-                FullName = txtFullName.Text.Trim(),
-                PhoneNumber = txtPhoneNumber.Text.Trim(),
-                Email = txtEmail.Text.Trim(),
-                Address = txtAddress.Text.Trim(),
-                RewardPoints = (int)numRewardPoints.Value
-            };
+                bool isExist = db.Customers.Any(c => c.PhoneNumber == txtPhoneNumber.Text.Trim());
+                if (isExist)
+                {
+                    MessageBox.Show("Số điện thoại này đã tồn tại trong hệ thống!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-            mockCustomerList.Add(newCustomer);
-            LoadCustomerDataGrid();
-            ClearFormInputs();
+                var newCustomer = new Customer
+                {
+                    FullName = txtFullName.Text.Trim(),
+                    PhoneNumber = txtPhoneNumber.Text.Trim(),
+                    Email = txtEmail.Text.Trim(),
+                    Address = txtAddress.Text.Trim(),
+                    RewardPoints = (int)numRewardPoints.Value
+                };
 
-            MessageBox.Show($"Đã thêm mới khách hàng '{newCustomer.FullName}' (Hạng: {newCustomer.CustomerTier}) thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                db.Customers.Add(newCustomer);
+                db.SaveChanges();
+
+                LoadCustomerDataGrid();
+                ClearFormInputs();
+
+                MessageBox.Show($"Đã thêm mới khách hàng '{newCustomer.FullName}' thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
+        // 4. CẬP NHẬT
         private void btnEdit_Click(object sender, EventArgs e)
         {
             if (selectedCustomerId <= 0)
             {
-                MessageBox.Show("Vui lòng chọn khách hàng cần cập nhật từ danh sách!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn khách hàng cần cập nhật!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var customer = mockCustomerList.FirstOrDefault(c => c.CustomerId == selectedCustomerId);
-            if (customer != null)
+            using (var db = new QlyBanGiayContext())
             {
-                customer.FullName = txtFullName.Text.Trim();
-                customer.PhoneNumber = txtPhoneNumber.Text.Trim();
-                customer.Email = txtEmail.Text.Trim();
-                customer.Address = txtAddress.Text.Trim();
-                customer.RewardPoints = (int)numRewardPoints.Value;
+                var customer = db.Customers.FirstOrDefault(c => c.CustomerId == selectedCustomerId);
+                if (customer != null)
+                {
+                    customer.FullName = txtFullName.Text.Trim();
+                    customer.PhoneNumber = txtPhoneNumber.Text.Trim();
+                    customer.Email = txtEmail.Text.Trim();
+                    customer.Address = txtAddress.Text.Trim();
+                    customer.RewardPoints = (int)numRewardPoints.Value;
 
-                LoadCustomerDataGrid();
-                ClearFormInputs();
-                MessageBox.Show("Đã cập nhật thông tin khách hàng thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    db.SaveChanges();
+
+                    LoadCustomerDataGrid();
+                    ClearFormInputs();
+                    MessageBox.Show("Đã cập nhật thông tin khách hàng thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
+        // 5. XÓA KHÁCH HÀNG
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (selectedCustomerId <= 0)
@@ -131,63 +148,53 @@ namespace LTWIN.Forms
                 return;
             }
 
-            var customer = mockCustomerList.FirstOrDefault(c => c.CustomerId == selectedCustomerId);
-            if (customer != null)
+            using (var db = new QlyBanGiayContext())
             {
-                var confirm = MessageBox.Show(
-                    $"Bạn có chắc muốn xóa khách hàng '{customer.FullName}' khỏi hệ thống?",
-                    "Xác Nhận Xóa",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question
-                );
-
-                if (confirm == DialogResult.Yes)
+                var customer = db.Customers.FirstOrDefault(c => c.CustomerId == selectedCustomerId);
+                if (customer != null)
                 {
-                    mockCustomerList.Remove(customer);
-                    LoadCustomerDataGrid();
-                    ClearFormInputs();
-                    MessageBox.Show("Đã xóa khách hàng thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    var confirm = MessageBox.Show($"Bạn có chắc muốn xóa khách hàng '{customer.FullName}'?", "Xác Nhận Xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (confirm == DialogResult.Yes)
+                    {
+                        db.Customers.Remove(customer);
+                        db.SaveChanges();
+
+                        LoadCustomerDataGrid();
+                        ClearFormInputs();
+                        MessageBox.Show("Đã xóa khách hàng thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
             }
         }
 
+        // 6. CỘNG ĐIỂM THƯỞNG
         private void btnAddPoints_Click(object sender, EventArgs e)
         {
             if (selectedCustomerId <= 0)
             {
-                MessageBox.Show("Vui lòng chọn khách hàng để cộng điểm thưởng mua giày!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn khách hàng để cộng điểm!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var customer = mockCustomerList.FirstOrDefault(c => c.CustomerId == selectedCustomerId);
-            if (customer != null)
+            using (var db = new QlyBanGiayContext())
             {
-                customer.RewardPoints += 50;
-                numRewardPoints.Value = customer.RewardPoints;
+                var customer = db.Customers.FirstOrDefault(c => c.CustomerId == selectedCustomerId);
+                if (customer != null)
+                {
+                    customer.RewardPoints += 50;
+                    db.SaveChanges();
 
-                LoadCustomerDataGrid();
-                MessageBox.Show($"Đã tích lũy thêm +50 điểm cho khách hàng '{customer.FullName}'.\n\nTổng điểm hiện tại: {customer.RewardPoints} Đ (Hạng: {customer.CustomerTier})", 
-                                "Tích Điểm Thành Công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    numRewardPoints.Value = customer.RewardPoints;
+                    LoadCustomerDataGrid();
+
+                    MessageBox.Show($"Đã cộng +50 điểm cho khách hàng '{customer.FullName}'.\nTổng điểm: {customer.RewardPoints} Đ", "Tích Điểm Thành Công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
-        private void btnClear_Click(object sender, EventArgs e)
-        {
-            ClearFormInputs();
-        }
-
-        private void btnSearch_Click(object sender, EventArgs e)
-        {
-            string keyword = txtSearch.Text.Trim().ToLower();
-
-            var filtered = mockCustomerList.Where(c =>
-                string.IsNullOrEmpty(keyword) ||
-                c.FullName.ToLower().Contains(keyword) ||
-                c.PhoneNumber.Contains(keyword)
-            ).ToList();
-
-            LoadCustomerDataGrid(filtered);
-        }
+        // 7. TÌM KIẾM VÀ RESET
+        private void btnSearch_Click(object sender, EventArgs e) => LoadCustomerDataGrid();
+        private void btnClear_Click(object sender, EventArgs e) => ClearFormInputs();
 
         private void ClearFormInputs()
         {
@@ -196,7 +203,9 @@ namespace LTWIN.Forms
             txtPhoneNumber.Text = string.Empty;
             txtEmail.Text = string.Empty;
             txtAddress.Text = string.Empty;
+            txtSearch.Text = string.Empty;
             numRewardPoints.Value = 0;
+            txtFullName.Focus();
         }
     }
 }
