@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using LTWIN.Models;
-using LTWIN.Services;
 using LTWIN.Utils;
 
 namespace LTWIN.Forms
@@ -22,143 +21,203 @@ namespace LTWIN.Forms
             public decimal TotalPrice => UnitPrice * Quantity;
         }
 
-        private List<Product> mockProductList;
-        private List<Category> mockCategoryList;
-        private List<Customer> mockCustomerList;
         private List<POSCartItem> posCartItems;
 
         public FormPOS()
         {
             InitializeComponent();
             posCartItems = new List<POSCartItem>();
-            InitMockPOSData();
         }
 
-        private void InitMockPOSData()
-        {
-            mockCategoryList = new List<Category>
-            {
-                new Category { CategoryId = 1, Name = "Giày Sneaker" },
-                new Category { CategoryId = 2, Name = "Giày Chạy Bộ (Running)" },
-                new Category { CategoryId = 3, Name = "Giày Bóng Rổ (Basketball)" },
-                new Category { CategoryId = 4, Name = "Giày Thể Thao Casual" }
-            };
-
-            mockProductList = new List<Product>
-            {
-                new Product { ProductId = 1, CategoryId = 1, Name = "Nike Air Max 270 React", Price = 3200000, StockQuantity = 15, Category = mockCategoryList[0] },
-                new Product { ProductId = 2, CategoryId = 2, Name = "Adidas Ultraboost 22", Price = 3850000, StockQuantity = 8, Category = mockCategoryList[1] },
-                new Product { ProductId = 3, CategoryId = 3, Name = "Air Jordan 1 Retro High", Price = 4500000, StockQuantity = 5, Category = mockCategoryList[2] },
-                new Product { ProductId = 4, CategoryId = 4, Name = "Puma RS-X Reinvent", Price = 2490000, StockQuantity = 20, Category = mockCategoryList[3] }
-            };
-
-            mockCustomerList = new List<Customer>
-            {
-                new Customer { CustomerId = 0, FullName = "Khách Lẻ (Không Tích Điểm)", PhoneNumber = "" },
-                new Customer { CustomerId = 1, FullName = "Nguyễn Văn Hoàng (0988123456)", PhoneNumber = "0988123456", RewardPoints = 350 },
-                new Customer { CustomerId = 2, FullName = "Trần Thị Thu (0912345678)", PhoneNumber = "0912345678", RewardPoints = 120 },
-                new Customer { CustomerId = 3, FullName = "Phạm Minh Đức (0977888999)", PhoneNumber = "0977888999", RewardPoints = 550 }
-            };
-        }
-
+        // 1. SỰ KIỆN FORM LOAD -> TẢI DỮ LIỆU THỰC TẾ TỪ SQL SERVER
         private void FormPOS_Load(object sender, EventArgs e)
         {
-            ThemeHelper.StyleDataGridView(dgvShoesList);
-            ThemeHelper.StyleDataGridView(dgvCartList);
+            // Cấu hình trực tiếp chiều cao cho bảng ngay khi load để không bị ai ghi đè
+            ConfigureDataGridView(dgvShoesList);
+            ConfigureDataGridView(dgvCartList);
+
             LoadCategoryComboBox();
             LoadCustomerComboBox();
             LoadShoeGrid();
-            InitCartGridColumns();
+            UpdateCartGrid();
             UpdatePOSCalculations();
         }
 
+        private void ConfigureDataGridView(DataGridView dgv)
+        {
+            dgv.EnableHeadersVisualStyles = false;
+            dgv.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(30, 40, 50);
+            dgv.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.White;
+            dgv.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+
+            // Ép cứng chiều cao tiêu đề rộng rãi và không cho tự động co giãn
+            dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dgv.ColumnHeadersHeight = 45;
+
+            // Cố định chiều cao dòng dữ liệu
+            dgv.RowTemplate.Height = 35;
+            dgv.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(245, 247, 250);
+        }
+
+        // TẢI DANH MỤC TỪ CSDL
         private void LoadCategoryComboBox()
         {
             cmbCategoryFilter.SelectedIndexChanged -= cmbCategoryFilter_SelectedIndexChanged;
 
-            var filterList = new List<Category> { new Category { CategoryId = 0, Name = "-- Tất cả danh mục --" } };
-            filterList.AddRange(mockCategoryList);
+            using (var db = new QlyBanGiayContext())
+            {
+                var categories = db.Categories.ToList();
+                var filterList = new List<Category> { new Category { CategoryId = 0, Name = "-- Tất cả danh mục --" } };
+                filterList.AddRange(categories);
 
-            cmbCategoryFilter.DataSource = filterList;
-            cmbCategoryFilter.DisplayMember = "Name";
-            cmbCategoryFilter.ValueMember = "CategoryId";
+                cmbCategoryFilter.DataSource = filterList;
+                cmbCategoryFilter.DisplayMember = "Name";
+                cmbCategoryFilter.ValueMember = "CategoryId";
+            }
 
             cmbCategoryFilter.SelectedIndexChanged += cmbCategoryFilter_SelectedIndexChanged;
         }
 
+        // TẢI KHÁCH HÀNG TỪ CSDL
         private void LoadCustomerComboBox()
         {
-            cmbCustomer.DataSource = mockCustomerList;
-            cmbCustomer.DisplayMember = "FullName";
-            cmbCustomer.ValueMember = "CustomerId";
+            using (var db = new QlyBanGiayContext())
+            {
+                var customers = db.Customers.ToList();
+                var customerList = new List<Customer>
+                {
+                    new Customer { CustomerId = 0, FullName = "Khách Lẻ (Không Tích Điểm)", PhoneNumber = "" }
+                };
+                customerList.AddRange(customers);
+
+                cmbCustomer.DataSource = customerList;
+                cmbCustomer.DisplayMember = "FullName";
+                cmbCustomer.ValueMember = "CustomerId";
+            }
         }
 
+        // TẢI BẢNG MẪU GIÀY TỪ CSDL SQL SERVER
         private void LoadShoeGrid(List<Product> listToDisplay = null)
         {
             dgvShoesList.Columns.Clear();
-            var sourceList = listToDisplay ?? mockProductList;
 
-            var displayData = sourceList.Select(p => new
+            using (var db = new QlyBanGiayContext())
             {
-                Mã_SP = p.ProductId,
-                Tên_Mẫu_Giày = p.Name,
-                Giá_Bán = p.Price.ToString("N0") + " VNĐ",
-                Tồn_Kho = p.StockQuantity
-            }).ToList();
+                List<Product> sourceList = listToDisplay;
 
-            dgvShoesList.DataSource = displayData;
+                if (sourceList == null)
+                {
+                    // Lấy toàn bộ sản phẩm còn tồn kho > 0
+                    sourceList = db.Products.Where(p => p.StockQuantity > 0).ToList();
+                }
 
-            DataGridViewButtonColumn btnSelectCol = new DataGridViewButtonColumn();
-            btnSelectCol.Name = "colSelect";
-            btnSelectCol.HeaderText = "Thao Tác";
-            btnSelectCol.Text = "➕ Chọn";
-            btnSelectCol.UseColumnTextForButtonValue = true;
-            btnSelectCol.FlatStyle = FlatStyle.Flat;
-            dgvShoesList.Columns.Add(btnSelectCol);
+                var displayData = sourceList.Select(p => new
+                {
+                    Mã_SP = p.ProductId,
+                    Tên_Mẫu_Giày = p.Name,
+                    Giá_Bán = p.Price.ToString("N0") + " VNĐ",
+                    Tồn_Kho = p.StockQuantity
+                }).ToList();
+
+                dgvShoesList.DataSource = displayData;
+
+                // Thêm cột nút "Thêm vào giỏ"
+                DataGridViewButtonColumn btnSelectCol = new DataGridViewButtonColumn
+                {
+                    Name = "colSelect",
+                    HeaderText = "Thao Tác",
+                    Text = "➕ Chọn",
+                    UseColumnTextForButtonValue = true,
+                    FlatStyle = FlatStyle.Flat
+                };
+                dgvShoesList.Columns.Add(btnSelectCol);
+            }
         }
 
-        private void InitCartGridColumns()
+        // 2. TÌM KIẾM VÀ LỌC GIÀY TỪ CSDL
+        private void btnSearchShoe_Click(object sender, EventArgs e) => FilterShoes();
+
+        private void cmbCategoryFilter_SelectedIndexChanged(object sender, EventArgs e) => FilterShoes();
+
+        private void FilterShoes()
         {
-            dgvCartList.Columns.Clear();
-            UpdateCartGrid();
+            string keyword = txtSearchShoe.Text.Trim().ToLower();
+            int catId = (cmbCategoryFilter.SelectedItem as Category)?.CategoryId ?? 0;
+
+            using (var db = new QlyBanGiayContext())
+            {
+                var query = db.Products.Where(p => p.StockQuantity > 0).AsQueryable();
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(p => p.Name.ToLower().Contains(keyword));
+                }
+
+                if (catId > 0)
+                {
+                    query = query.Where(p => p.CategoryId == catId);
+                }
+
+                LoadShoeGrid(query.ToList());
+            }
         }
 
+        // 3. THÊM SẢN PHẨM VÀO GIỎ HÀNG
         private void dgvShoesList_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && e.ColumnIndex == dgvShoesList.Columns["colSelect"].Index)
+            if (e.RowIndex >= 0 && dgvShoesList.Columns.Contains("colSelect") && e.ColumnIndex == dgvShoesList.Columns["colSelect"].Index)
             {
                 int productId = Convert.ToInt32(dgvShoesList.Rows[e.RowIndex].Cells["Mã_SP"].Value);
-                var shoe = mockProductList.FirstOrDefault(p => p.ProductId == productId);
-
-                if (shoe != null)
-                {
-                    AddShoeToCart(shoe);
-                }
+                AddProductIdToCart(productId);
             }
         }
 
-        private void AddShoeToCart(Product shoe)
+        private void dgvShoesList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            var existingItem = posCartItems.FirstOrDefault(i => i.ProductId == shoe.ProductId);
-            if (existingItem != null)
+            if (e.RowIndex >= 0)
             {
-                existingItem.Quantity += 1;
+                int productId = Convert.ToInt32(dgvShoesList.Rows[e.RowIndex].Cells["Mã_SP"].Value);
+                AddProductIdToCart(productId);
             }
-            else
-            {
-                posCartItems.Add(new POSCartItem
-                {
-                    ProductId = shoe.ProductId,
-                    ProductName = shoe.Name,
-                    UnitPrice = shoe.Price,
-                    Quantity = 1
-                });
-            }
-
-            UpdateCartGrid();
-            UpdatePOSCalculations();
         }
 
+        private void AddProductIdToCart(int productId)
+        {
+            using (var db = new QlyBanGiayContext())
+            {
+                var shoe = db.Products.FirstOrDefault(p => p.ProductId == productId);
+                if (shoe == null) return;
+
+                var existingItem = posCartItems.FirstOrDefault(i => i.ProductId == productId);
+                int currentQtyInCart = existingItem != null ? existingItem.Quantity : 0;
+
+                if (currentQtyInCart + 1 > shoe.StockQuantity)
+                {
+                    MessageBox.Show($"Mẫu giày '{shoe.Name}' chỉ còn tồn kho {shoe.StockQuantity} đôi!", "Cảnh Báo Tồn Kho", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (existingItem != null)
+                {
+                    existingItem.Quantity += 1;
+                }
+                else
+                {
+                    posCartItems.Add(new POSCartItem
+                    {
+                        ProductId = shoe.ProductId,
+                        ProductName = shoe.Name,
+                        UnitPrice = shoe.Price,
+                        Quantity = 1
+                    });
+                }
+
+                UpdateCartGrid();
+                UpdatePOSCalculations();
+            }
+        }
+
+        // 4. CẬP NHẬT GIỎ HÀNG VÀ TÍNH TIỀN
         private void UpdateCartGrid()
         {
             dgvCartList.Columns.Clear();
@@ -174,12 +233,14 @@ namespace LTWIN.Forms
 
             dgvCartList.DataSource = displayCart;
 
-            DataGridViewButtonColumn btnRemoveCol = new DataGridViewButtonColumn();
-            btnRemoveCol.Name = "colRemove";
-            btnRemoveCol.HeaderText = "Xóa";
-            btnRemoveCol.Text = "🗑️ Xóa";
-            btnRemoveCol.UseColumnTextForButtonValue = true;
-            btnRemoveCol.FlatStyle = FlatStyle.Flat;
+            DataGridViewButtonColumn btnRemoveCol = new DataGridViewButtonColumn
+            {
+                Name = "colRemove",
+                HeaderText = "Xóa",
+                Text = "🗑️ Xóa",
+                UseColumnTextForButtonValue = true,
+                FlatStyle = FlatStyle.Flat
+            };
             dgvCartList.Columns.Add(btnRemoveCol);
         }
 
@@ -198,20 +259,6 @@ namespace LTWIN.Forms
                 }
             }
         }
-        private void CalculateTotal()
-        {
-            decimal total = 0;
-
-            foreach (DataGridViewRow row in dgvCartList.Rows)
-            {
-                if (row.Cells["Total"].Value != null)
-                {
-                    total += Convert.ToDecimal(row.Cells["Total"].Value);
-                }
-            }
-            lblSubTotal.Text = total.ToString("N0") + " VNĐ";
-            lblGrandTotal.Text = total.ToString("N0") + " VNĐ";
-        }
 
         private void UpdatePOSCalculations()
         {
@@ -226,15 +273,9 @@ namespace LTWIN.Forms
             lblChangeMoney.Text = changeMoney.ToString("N0") + " VNĐ";
         }
 
-        private void numDiscount_ValueChanged(object sender, EventArgs e)
-        {
-            UpdatePOSCalculations();
-        }
+        private void numDiscount_ValueChanged(object sender, EventArgs e) => UpdatePOSCalculations();
 
-        private void numCustomerMoney_ValueChanged(object sender, EventArgs e)
-        {
-            UpdatePOSCalculations();
-        }
+        private void numCustomerMoney_ValueChanged(object sender, EventArgs e) => UpdatePOSCalculations();
 
         private void btnClearCart_Click(object sender, EventArgs e)
         {
@@ -250,66 +291,7 @@ namespace LTWIN.Forms
             }
         }
 
-
-        private void btnSearchShoe_Click(object sender, EventArgs e)
-        {
-            FilterShoes();
-        }
-
-        private void cmbCategoryFilter_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            FilterShoes();
-        }
-
-        private void FilterShoes()
-        {
-            string keyword = txtSearchShoe.Text.Trim().ToLower();
-            int catId = (cmbCategoryFilter.SelectedItem as Category)?.CategoryId ?? 0;
-
-            var filtered = mockProductList.Where(p =>
-                (string.IsNullOrEmpty(keyword) || p.Name.ToLower().Contains(keyword)) &&
-                (catId == 0 || p.CategoryId == catId)
-            ).ToList();
-
-            LoadShoeGrid(filtered);
-        }
-
-        private void dgvShoesList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                // Lấy thông tin đôi giày vừa click
-                DataGridViewRow row = dgvShoesList.Rows[e.RowIndex];
-                string productId = row.Cells["ProductId"].Value.ToString();
-                string productName = row.Cells["ProductName"].Value.ToString();
-                decimal price = Convert.ToDecimal(row.Cells["Price"].Value);
-
-                // 1. Kiểm tra xem giày này đã có trong giỏ hàng (dgvCartList) chưa
-                bool isExists = false;
-                foreach (DataGridViewRow cartRow in dgvCartList.Rows)
-                {
-                    if (cartRow.Cells["ProductId"].Value != null && cartRow.Cells["ProductId"].Value.ToString() == productId)
-                    {
-                        // Nếu có rồi thì cộng thêm 1 vào số lượng
-                        int currentQuantity = Convert.ToInt32(cartRow.Cells["Quantity"].Value);
-                        cartRow.Cells["Quantity"].Value = currentQuantity + 1;
-                        cartRow.Cells["Total"].Value = (currentQuantity + 1) * price;
-                        isExists = true;
-                        break;
-                    }
-                }
-
-                // 2. Nếu chưa có thì tạo một dòng mới trong giỏ hàng
-                if (!isExists)
-                {
-                    dgvCartList.Rows.Add(productId, productName, 1, price, price);
-                }
-
-                // 3. Tính lại tổng tiền sau khi thêm
-                CalculateTotal();
-            }
-        }
-
+        // 5. THANH TOÁN BÁN HÀNG -> LƯU HÓA ĐƠN SQL, TRỪ TỒN KHO & TÍCH ĐIỂM
         private void btnCompletePayment_Click(object sender, EventArgs e)
         {
             if (!posCartItems.Any())
@@ -323,23 +305,21 @@ namespace LTWIN.Forms
             decimal grandTotal = Math.Max(0, subTotal - discount);
             decimal customerMoney = numCustomerMoney.Value;
 
-            // SỬA LỖI 1: Chỉ cần kiểm tra tiền khách đưa nhỏ hơn tổng tiền là chặn luôn
             if (customerMoney < grandTotal)
             {
                 MessageBox.Show($"Số tiền khách đưa ({customerMoney:N0} VNĐ) còn thiếu {(grandTotal - customerMoney):N0} VNĐ!", "Cảnh Báo Thanh Toán", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // Kết nối Database thật để lưu
             using (var db = new QlyBanGiayContext())
             {
                 using (var transaction = db.Database.BeginTransaction())
                 {
                     try
                     {
-                        User selectedCustomer = cmbCustomer.SelectedItem as User;
-                        int customerId = selectedCustomer != null ? selectedCustomer.UserId : 1;
-                        string customerName = selectedCustomer != null ? selectedCustomer.FullName : "Khách Lẻ";
+                        Customer selectedCustomer = cmbCustomer.SelectedItem as Customer;
+                        int customerId = selectedCustomer != null ? selectedCustomer.CustomerId : 0;
+                        string customerName = (selectedCustomer != null && customerId > 0) ? selectedCustomer.FullName : "Khách Lẻ";
 
                         string invoiceCode = "POS" + DateTime.Now.ToString("yyyyMMddHHmmss");
 
@@ -347,26 +327,24 @@ namespace LTWIN.Forms
                         int earnedPoints = (int)(grandTotal / 100000);
                         if (customerId > 0 && earnedPoints > 0)
                         {
-                            // Cập nhật điểm cho User trong DB thật
-                            var dbUser = db.Users.Find(customerId);
-                            if (dbUser != null)
+                            var dbCustomer = db.Customers.FirstOrDefault(c => c.CustomerId == customerId);
+                            if (dbCustomer != null)
                             {
-                                dbUser.RewardPoints += earnedPoints;
+                                dbCustomer.RewardPoints += earnedPoints;
                             }
                         }
 
-                        // Lưu Hóa Đơn vào DB thật
+                        // Tạo hóa đơn mới
                         var newOrder = new Order
                         {
                             OrderDate = DateTime.Now,
                             TotalAmount = grandTotal,
-                            UserId = customerId
-                            // Nếu DB của bạn có thêm cột Discount hay InvoiceCode thì map vào đây
+                            UserId = UserSession.UserId > 0 ? UserSession.UserId : 1
                         };
-                        db.Orders.Add(newOrder);
-                        db.SaveChanges(); // Lấy OrderId
 
-                        // Chuẩn bị chuỗi in hóa đơn
+                        db.Orders.Add(newOrder);
+                        db.SaveChanges(); // Lấy OrderId tự tăng
+
                         string invoiceContent = $"========================================\n" +
                                                 $"       HÓA ĐƠN BÁN HÀNG SNEAKER STORE   \n" +
                                                 $"========================================\n" +
@@ -375,18 +353,17 @@ namespace LTWIN.Forms
                                                 $"Khách hàng : {customerName}\n" +
                                                 $"----------------------------------------\n";
 
-                        // Lưu Chi tiết Hóa Đơn & Trừ tồn kho
+                        // Lưu chi tiết hóa đơn & Trừ tồn kho
                         foreach (var item in posCartItems)
                         {
-                            // Lấy sản phẩm từ DB để trừ tồn kho
                             var dbShoe = db.Products.FirstOrDefault(p => p.ProductId == item.ProductId);
-                            if (dbShoe != null)
+                            if (dbShoe == null || dbShoe.StockQuantity < item.Quantity)
                             {
-                                if (dbShoe.StockQuantity < item.Quantity) throw new Exception($"Giày {dbShoe.Name} không đủ hàng!");
-                                dbShoe.StockQuantity -= item.Quantity; // Trừ tồn kho
+                                throw new Exception($"Mẫu giày '{item.ProductName}' không đủ số lượng trong kho!");
                             }
 
-                            // Lưu vào bảng OrderDetails
+                            dbShoe.StockQuantity -= item.Quantity; // Trừ kho
+
                             db.OrderDetails.Add(new OrderDetail
                             {
                                 OrderId = newOrder.OrderId,
@@ -395,15 +372,13 @@ namespace LTWIN.Forms
                                 UnitPrice = item.UnitPrice
                             });
 
-                            // Cộng chuỗi in
                             invoiceContent += $"• {item.ProductName}\n" +
                                               $"  Đơn giá: {item.UnitPrice:N0} VNĐ x {item.Quantity} = {item.TotalPrice:N0} VNĐ\n";
                         }
 
-                        db.SaveChanges(); // Lưu tất cả thay đổi
+                        db.SaveChanges();
                         transaction.Commit(); // Chốt giao dịch an toàn
 
-                        // Hoàn thiện chuỗi in hóa đơn
                         invoiceContent += $"----------------------------------------\n" +
                                           $"Tổng tiền hàng: {subTotal:N0} VNĐ\n" +
                                           $"Chiết khấu    : -{discount:N0} VNĐ\n" +
@@ -411,30 +386,30 @@ namespace LTWIN.Forms
                                           $"Tiền khách đưa : {customerMoney:N0} VNĐ\n" +
                                           $"Tiền thừa trả  : {(customerMoney - grandTotal):N0} VNĐ\n" +
                                           $"----------------------------------------\n" +
-                                          (selectedCustomer != null ? $"🎁 Tích lũy thêm: +{earnedPoints} Điểm\n" : "") +
+                                          (customerId > 0 ? $"🎁 Tích lũy thêm: +{earnedPoints} Điểm\n" : "") +
                                           $"========================================\n" +
                                           $"Cảm ơn quý khách và hẹn gặp lại!\n";
 
-                        // Hiển thị Preview
+                        // Mở cửa sổ in hóa đơn
                         string fileName = $"HoaDon_POS_{invoiceCode}.txt";
                         using (FormInvoicePreview previewForm = new FormInvoicePreview("Hóa Đơn Bán Hàng POS", invoiceContent, fileName))
                         {
                             previewForm.ShowDialog(this);
                         }
 
-                        // Dọn dẹp UI sau khi bán xong
+                        // Reset giao diện
                         posCartItems.Clear();
                         numDiscount.Value = 0;
                         numCustomerMoney.Value = 0;
                         UpdateCartGrid();
-                        LoadShoeGrid(); // Gọi lại hàm của bạn để load tồn kho mới
+                        LoadShoeGrid();
                         UpdatePOSCalculations();
                     }
                     catch (Exception ex)
                     {
                         transaction.Rollback();
                         string errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-                        MessageBox.Show("Lỗi chi tiết từ SQL: " + errorMsg, "Lỗi Thanh Toán", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Lỗi thanh toán: " + errorMsg, "Lỗi Bán Hàng", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }

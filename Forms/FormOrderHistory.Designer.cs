@@ -40,6 +40,7 @@ namespace LTWIN.Forms
             grpDetails = new GroupBox();
             dgvOrderDetails = new DataGridView();
             panelBottom = new Panel();
+            btnExport = new Button();
             lblSummary = new Label();
             btnCancelOrder = new Button();
             btnRePrint = new Button();
@@ -62,8 +63,9 @@ namespace LTWIN.Forms
             panelTop.Controls.Add(lblHeaderTitle);
             panelTop.Dock = DockStyle.Top;
             panelTop.Location = new Point(0, 0);
+            panelTop.Margin = new Padding(3, 4, 3, 4);
             panelTop.Name = "panelTop";
-            panelTop.Size = new Size(960, 60);
+            panelTop.Size = new Size(1097, 80);
             panelTop.TabIndex = 0;
             // 
             // btnSearch
@@ -73,9 +75,10 @@ namespace LTWIN.Forms
             btnSearch.FlatStyle = FlatStyle.Flat;
             btnSearch.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnSearch.ForeColor = Color.White;
-            btnSearch.Location = new Point(855, 16);
+            btnSearch.Location = new Point(977, 21);
+            btnSearch.Margin = new Padding(3, 4, 3, 4);
             btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(90, 30);
+            btnSearch.Size = new Size(103, 40);
             btnSearch.TabIndex = 4;
             btnSearch.Text = "🔍 Tìm";
             btnSearch.UseVisualStyleBackColor = false;
@@ -84,10 +87,11 @@ namespace LTWIN.Forms
             // txtSearch
             // 
             txtSearch.Font = new Font("Segoe UI", 9.5F);
-            txtSearch.Location = new Point(620, 19);
+            txtSearch.Location = new Point(709, 25);
+            txtSearch.Margin = new Padding(3, 4, 3, 4);
             txtSearch.Name = "txtSearch";
             txtSearch.PlaceholderText = "Nhập mã hóa đơn, tên khách...";
-            txtSearch.Size = new Size(225, 24);
+            txtSearch.Size = new Size(257, 29);
             txtSearch.TabIndex = 3;
             // 
             // cmbTimeFilter
@@ -96,9 +100,10 @@ namespace LTWIN.Forms
             cmbTimeFilter.Font = new Font("Segoe UI", 9.5F);
             cmbTimeFilter.FormattingEnabled = true;
             cmbTimeFilter.Items.AddRange(new object[] { "-- Tất cả thời gian --", "Hôm nay", "7 ngày gần đây", "Tháng này" });
-            cmbTimeFilter.Location = new Point(440, 18);
+            cmbTimeFilter.Location = new Point(503, 24);
+            cmbTimeFilter.Margin = new Padding(3, 4, 3, 4);
             cmbTimeFilter.Name = "cmbTimeFilter";
-            cmbTimeFilter.Size = new Size(165, 25);
+            cmbTimeFilter.Size = new Size(188, 29);
             cmbTimeFilter.TabIndex = 2;
             cmbTimeFilter.SelectedIndexChanged += cmbTimeFilter_SelectedIndexChanged;
             // 
@@ -106,9 +111,9 @@ namespace LTWIN.Forms
             // 
             lblTimeFilterTitle.AutoSize = true;
             lblTimeFilterTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            lblTimeFilterTitle.Location = new Point(380, 23);
+            lblTimeFilterTitle.Location = new Point(434, 31);
             lblTimeFilterTitle.Name = "lblTimeFilterTitle";
-            lblTimeFilterTitle.Size = new Size(57, 15);
+            lblTimeFilterTitle.Size = new Size(78, 20);
             lblTimeFilterTitle.TabIndex = 1;
             lblTimeFilterTitle.Text = "Thời gian:";
             // 
@@ -117,9 +122,9 @@ namespace LTWIN.Forms
             lblHeaderTitle.AutoSize = true;
             lblHeaderTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblHeaderTitle.ForeColor = Color.FromArgb(47, 53, 66);
-            lblHeaderTitle.Location = new Point(15, 18);
+            lblHeaderTitle.Location = new Point(17, 24);
             lblHeaderTitle.Name = "lblHeaderTitle";
-            lblHeaderTitle.Size = new Size(254, 21);
+            lblHeaderTitle.Size = new Size(362, 28);
             lblHeaderTitle.TabIndex = 0;
             lblHeaderTitle.Text = "📜 LỊCH SỬ BÁN HÀNG && HÓA ĐƠN";
             // 
@@ -130,12 +135,13 @@ namespace LTWIN.Forms
             panelMain.Controls.Add(grpOrders, 0, 0);
             panelMain.Controls.Add(grpDetails, 0, 1);
             panelMain.Dock = DockStyle.Fill;
-            panelMain.Location = new Point(0, 60);
+            panelMain.Location = new Point(0, 80);
+            panelMain.Margin = new Padding(3, 4, 3, 4);
             panelMain.Name = "panelMain";
             panelMain.RowCount = 2;
             panelMain.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             panelMain.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-            panelMain.Size = new Size(960, 475);
+            panelMain.Size = new Size(1097, 633);
             panelMain.TabIndex = 1;
             // 
             // grpOrders
@@ -143,10 +149,11 @@ namespace LTWIN.Forms
             grpOrders.Controls.Add(dgvOrders);
             grpOrders.Dock = DockStyle.Fill;
             grpOrders.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grpOrders.Location = new Point(10, 10);
-            grpOrders.Margin = new Padding(10);
+            grpOrders.Location = new Point(11, 13);
+            grpOrders.Margin = new Padding(11, 13, 11, 13);
             grpOrders.Name = "grpOrders";
-            grpOrders.Size = new Size(940, 241);
+            grpOrders.Padding = new Padding(3, 4, 3, 4);
+            grpOrders.Size = new Size(1075, 322);
             grpOrders.TabIndex = 0;
             grpOrders.TabStop = false;
             grpOrders.Text = "📋 Danh Sách Hóa Đơn Đã Lập";
@@ -160,14 +167,16 @@ namespace LTWIN.Forms
             dgvOrders.BorderStyle = BorderStyle.None;
             dgvOrders.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvOrders.Dock = DockStyle.Fill;
-            dgvOrders.Location = new Point(3, 20);
+            dgvOrders.Location = new Point(3, 26);
+            dgvOrders.Margin = new Padding(3, 4, 3, 4);
             dgvOrders.MultiSelect = false;
             dgvOrders.Name = "dgvOrders";
             dgvOrders.ReadOnly = true;
             dgvOrders.RowHeadersVisible = false;
+            dgvOrders.RowHeadersWidth = 51;
             dgvOrders.RowTemplate.Height = 32;
             dgvOrders.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvOrders.Size = new Size(934, 218);
+            dgvOrders.Size = new Size(1069, 292);
             dgvOrders.TabIndex = 0;
             dgvOrders.SelectionChanged += dgvOrders_SelectionChanged;
             // 
@@ -176,10 +185,11 @@ namespace LTWIN.Forms
             grpDetails.Controls.Add(dgvOrderDetails);
             grpDetails.Dock = DockStyle.Fill;
             grpDetails.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grpDetails.Location = new Point(10, 271);
-            grpDetails.Margin = new Padding(10);
+            grpDetails.Location = new Point(11, 361);
+            grpDetails.Margin = new Padding(11, 13, 11, 13);
             grpDetails.Name = "grpDetails";
-            grpDetails.Size = new Size(940, 194);
+            grpDetails.Padding = new Padding(3, 4, 3, 4);
+            grpDetails.Size = new Size(1075, 259);
             grpDetails.TabIndex = 1;
             grpDetails.TabStop = false;
             grpDetails.Text = "🛍️ Chi Tiết Các Mẫu Giày Trong Hóa Đơn Được Chọn";
@@ -193,37 +203,58 @@ namespace LTWIN.Forms
             dgvOrderDetails.BorderStyle = BorderStyle.None;
             dgvOrderDetails.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvOrderDetails.Dock = DockStyle.Fill;
-            dgvOrderDetails.Location = new Point(3, 20);
+            dgvOrderDetails.Location = new Point(3, 26);
+            dgvOrderDetails.Margin = new Padding(3, 4, 3, 4);
             dgvOrderDetails.MultiSelect = false;
             dgvOrderDetails.Name = "dgvOrderDetails";
             dgvOrderDetails.ReadOnly = true;
             dgvOrderDetails.RowHeadersVisible = false;
+            dgvOrderDetails.RowHeadersWidth = 51;
             dgvOrderDetails.RowTemplate.Height = 30;
             dgvOrderDetails.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvOrderDetails.Size = new Size(934, 171);
+            dgvOrderDetails.Size = new Size(1069, 229);
             dgvOrderDetails.TabIndex = 0;
             // 
             // panelBottom
             // 
             panelBottom.BackColor = Color.FromArgb(248, 249, 250);
+            panelBottom.Controls.Add(btnExport);
             panelBottom.Controls.Add(lblSummary);
             panelBottom.Controls.Add(btnCancelOrder);
             panelBottom.Controls.Add(btnRePrint);
+            panelBottom.Cursor = Cursors.Hand;
             panelBottom.Dock = DockStyle.Bottom;
-            panelBottom.Location = new Point(0, 535);
+            panelBottom.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            panelBottom.Location = new Point(0, 713);
+            panelBottom.Margin = new Padding(3, 4, 3, 4);
             panelBottom.Name = "panelBottom";
-            panelBottom.Padding = new Padding(15);
-            panelBottom.Size = new Size(960, 60);
+            panelBottom.Padding = new Padding(17, 20, 17, 20);
+            panelBottom.Size = new Size(1097, 80);
             panelBottom.TabIndex = 2;
+            // 
+            // btnExport
+            // 
+            btnExport.BackColor = Color.DimGray;
+            btnExport.FlatAppearance.BorderSize = 0;
+            btnExport.FlatStyle = FlatStyle.Flat;
+            btnExport.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnExport.ForeColor = SystemColors.ButtonFace;
+            btnExport.Location = new Point(503, 14);
+            btnExport.Name = "btnExport";
+            btnExport.Size = new Size(166, 48);
+            btnExport.TabIndex = 3;
+            btnExport.Text = "📊 Xuất Excel/CSV";
+            btnExport.UseVisualStyleBackColor = false;
+            btnExport.Click += btnExport_Click;
             // 
             // lblSummary
             // 
             lblSummary.AutoSize = true;
             lblSummary.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             lblSummary.ForeColor = Color.FromArgb(47, 53, 66);
-            lblSummary.Location = new Point(15, 20);
+            lblSummary.Location = new Point(17, 27);
             lblSummary.Name = "lblSummary";
-            lblSummary.Size = new Size(205, 19);
+            lblSummary.Size = new Size(249, 23);
             lblSummary.TabIndex = 2;
             lblSummary.Text = "📊 Tổng cộng: 0 đơn | 0 VNĐ";
             // 
@@ -235,9 +266,10 @@ namespace LTWIN.Forms
             btnCancelOrder.FlatStyle = FlatStyle.Flat;
             btnCancelOrder.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btnCancelOrder.ForeColor = Color.White;
-            btnCancelOrder.Location = new Point(810, 12);
+            btnCancelOrder.Location = new Point(902, 14);
+            btnCancelOrder.Margin = new Padding(3, 4, 3, 4);
             btnCancelOrder.Name = "btnCancelOrder";
-            btnCancelOrder.Size = new Size(135, 36);
+            btnCancelOrder.Size = new Size(178, 48);
             btnCancelOrder.TabIndex = 1;
             btnCancelOrder.Text = "🚫 Hủy Đơn Hàng";
             btnCancelOrder.UseVisualStyleBackColor = false;
@@ -251,9 +283,10 @@ namespace LTWIN.Forms
             btnRePrint.FlatStyle = FlatStyle.Flat;
             btnRePrint.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btnRePrint.ForeColor = Color.White;
-            btnRePrint.Location = new Point(625, 12);
+            btnRePrint.Location = new Point(675, 14);
+            btnRePrint.Margin = new Padding(3, 4, 3, 4);
             btnRePrint.Name = "btnRePrint";
-            btnRePrint.Size = new Size(175, 36);
+            btnRePrint.Size = new Size(221, 48);
             btnRePrint.TabIndex = 0;
             btnRePrint.Text = "🖨️ Xem && In Lại Hóa Đơn";
             btnRePrint.UseVisualStyleBackColor = false;
@@ -261,12 +294,13 @@ namespace LTWIN.Forms
             // 
             // FormOrderHistory
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(960, 595);
+            ClientSize = new Size(1097, 793);
             Controls.Add(panelMain);
             Controls.Add(panelBottom);
             Controls.Add(panelTop);
+            Margin = new Padding(3, 4, 3, 4);
             Name = "FormOrderHistory";
             Text = "Quản Lý Lịch Sử Hóa Đơn";
             Load += FormOrderHistory_Load;
@@ -299,5 +333,6 @@ namespace LTWIN.Forms
         private Button btnRePrint;
         private Button btnCancelOrder;
         private Label lblSummary;
+        private Button btnExport;
     }
 }

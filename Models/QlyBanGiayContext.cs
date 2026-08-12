@@ -14,7 +14,7 @@ public partial class QlyBanGiayContext : DbContext
         : base(options)
     {
     }
-
+    public virtual DbSet<Customer> Customers { get; set; }
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }

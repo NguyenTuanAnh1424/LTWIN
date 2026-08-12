@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using LTWIN.Models;
-
 using LTWIN.Utils;
 
 namespace LTWIN.Forms
@@ -12,84 +11,103 @@ namespace LTWIN.Forms
     public partial class FormCategory : Form
     {
         private int selectedCategoryId = -1;
-        private List<Category> categoryList;
 
         public FormCategory()
         {
             InitializeComponent();
-            InitMockCategories();
         }
 
-        private void InitMockCategories()
-        {
-            categoryList = new List<Category>
-            {
-                new Category { CategoryId = 1, Name = "Giày Sneaker", Description = "Giày thời trang năng động hàng ngày." },
-                new Category { CategoryId = 2, Name = "Giày Chạy Bộ (Running)", Description = "Đế êm hỗ trợ tập luyện thể thao chuyên nghiệp." },
-                new Category { CategoryId = 3, Name = "Giày Bóng Rổ (Basketball)", Description = "Cổ cao bảo vệ cổ chân, bám sàn cực tốt." },
-                new Category { CategoryId = 4, Name = "Giày Thể Thao Casual", Description = "Phong cách trẻ trung dạo phố." }
-            };
-        }
-
+        // 1. SỰ KIỆN KHI FORM MỞ LÊN -> TẢI DỮ LIỆU TỪ SQL SERVER
         private void FormCategory_Load(object sender, EventArgs e)
         {
             ThemeHelper.StyleDataGridView(dgvCategories);
             LoadCategoryDataGrid();
         }
 
-        private void LoadCategoryDataGrid(List<Category> listToDisplay = null)
+        // HÀM TẢI VÀ HÀM TÌM KIẾM DỮ LIỆU TRỰC TIẾP TỪ SQL SERVER
+        private void LoadCategoryDataGrid()
         {
-            var sourceList = listToDisplay ?? categoryList;
+            string keyword = txtSearch.Text.Trim().ToLower();
 
-            var displayData = sourceList.Select(c => new
+            using (var db = new QlyBanGiayContext())
             {
-                Mã_Danh_Mục = c.CategoryId,
-                Tên_Danh_Mục = c.Name,
-                Mô_Tả = c.Description
-            }).ToList();
+                var query = db.Categories.AsQueryable();
 
-            dgvCategories.DataSource = displayData;
+                // Lọc theo từ khóa nếu người dùng có nhập vào ô Tìm kiếm
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(c => c.Name.ToLower().Contains(keyword) ||
+                                             (c.Description != null && c.Description.ToLower().Contains(keyword)));
+                }
+
+                var displayData = query.Select(c => new
+                {
+                    Mã_Danh_Mục = c.CategoryId,
+                    Tên_Danh_Mục = c.Name,
+                    Mô_Tả = c.Description
+                }).ToList();
+
+                dgvCategories.DataSource = displayData;
+            }
         }
 
+        // 2. CLICK VÀO DÒNG TRONG BANG -> LẤY DỮ LIỆU LÊN Ô INPUT
         private void dgvCategories_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0 && dgvCategories.Rows[e.RowIndex].Cells[0].Value != null)
             {
                 selectedCategoryId = Convert.ToInt32(dgvCategories.Rows[e.RowIndex].Cells["Mã_Danh_Mục"].Value);
-                var category = categoryList.FirstOrDefault(c => c.CategoryId == selectedCategoryId);
 
-                if (category != null)
+                using (var db = new QlyBanGiayContext())
                 {
-                    txtCategoryName.Text = category.Name;
-                    txtDescription.Text = category.Description;
+                    var category = db.Categories.FirstOrDefault(c => c.CategoryId == selectedCategoryId);
+                    if (category != null)
+                    {
+                        txtCategoryName.Text = category.Name;
+                        txtDescription.Text = category.Description;
+                    }
                 }
             }
         }
 
+        // 3. THÊM DANH MỤC MỚI VÀO SQL SERVER
         private void btnAdd_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCategoryName.Text))
             {
                 MessageBox.Show("Vui lòng nhập tên danh mục!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCategoryName.Focus();
                 return;
             }
 
-            int newId = categoryList.Any() ? categoryList.Max(c => c.CategoryId) + 1 : 1;
-
-            var newCategory = new Category
+            using (var db = new QlyBanGiayContext())
             {
-                CategoryId = newId,
-                Name = txtCategoryName.Text.Trim(),
-                Description = txtDescription.Text.Trim()
-            };
+                // Kiểm tra trùng tên danh mục
+                bool isExist = db.Categories.Any(c => c.Name.ToLower() == txtCategoryName.Text.Trim().ToLower());
+                if (isExist)
+                {
+                    MessageBox.Show("Tên danh mục này đã tồn tại trong CSDL!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-            categoryList.Add(newCategory);
-            LoadCategoryDataGrid();
-            ClearInputs();
+                var newCategory = new Category
+                {
+                    Name = txtCategoryName.Text.Trim(),
+                    Description = txtDescription.Text.Trim()
+                };
 
-            MessageBox.Show($"Đã thêm danh mục '{newCategory.Name}' thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Lưu xuống CSDL SQL Server
+                db.Categories.Add(newCategory);
+                db.SaveChanges();
+
+                LoadCategoryDataGrid();
+                ClearInputs();
+
+                MessageBox.Show($"Đã thêm danh mục '{newCategory.Name}' vào SQL Server thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
+        // 4. CẬP NHẬT/SỬA DANH MỤC TRONG SQL SERVER
         private void btnEdit_Click(object sender, EventArgs e)
         {
             if (selectedCategoryId <= 0)
@@ -98,18 +116,32 @@ namespace LTWIN.Forms
                 return;
             }
 
-            var category = categoryList.FirstOrDefault(c => c.CategoryId == selectedCategoryId);
-            if (category != null)
+            if (string.IsNullOrWhiteSpace(txtCategoryName.Text))
             {
-                category.Name = txtCategoryName.Text.Trim();
-                category.Description = txtDescription.Text.Trim();
+                MessageBox.Show("Tên danh mục không được để trống!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCategoryName.Focus();
+                return;
+            }
 
-                LoadCategoryDataGrid();
-                ClearInputs();
-                MessageBox.Show("Đã cập nhật danh mục thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            using (var db = new QlyBanGiayContext())
+            {
+                var category = db.Categories.FirstOrDefault(c => c.CategoryId == selectedCategoryId);
+                if (category != null)
+                {
+                    category.Name = txtCategoryName.Text.Trim();
+                    category.Description = txtDescription.Text.Trim();
+
+                    // Cập nhật xuống CSDL SQL Server
+                    db.SaveChanges();
+
+                    LoadCategoryDataGrid();
+                    ClearInputs();
+                    MessageBox.Show("Đã cập nhật danh mục thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
+        // 5. XÓA DANH MỤC KHỎI SQL SERVER
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (selectedCategoryId <= 0)
@@ -118,30 +150,43 @@ namespace LTWIN.Forms
                 return;
             }
 
-            var category = categoryList.FirstOrDefault(c => c.CategoryId == selectedCategoryId);
-            if (category != null)
+            using (var db = new QlyBanGiayContext())
             {
-                var confirm = MessageBox.Show($"Bạn có chắc muốn xóa danh mục '{category.Name}'?", "Xác Nhận Xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (confirm == DialogResult.Yes)
+                var category = db.Categories.FirstOrDefault(c => c.CategoryId == selectedCategoryId);
+                if (category != null)
                 {
-                    categoryList.Remove(category);
-                    LoadCategoryDataGrid();
-                    ClearInputs();
-                    MessageBox.Show("Đã xóa danh mục thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Ràng buộc dữ liệu: Tránh xóa danh mục đang chứa sản phẩm
+                    bool hasProducts = db.Products.Any(p => p.CategoryId == selectedCategoryId);
+                    if (hasProducts)
+                    {
+                        MessageBox.Show("Không thể xóa danh mục này vì đang có mẫu giày thuộc danh mục!\n\nVui lòng xóa các mẫu giày đó trước.", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    var confirm = MessageBox.Show($"Bạn có chắc muốn xóa danh mục '{category.Name}' khỏi SQL Server?", "Xác Nhận Xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (confirm == DialogResult.Yes)
+                    {
+                        db.Categories.Remove(category);
+                        db.SaveChanges(); // Xóa hẳn khỏi SQL Server
+
+                        LoadCategoryDataGrid();
+                        ClearInputs();
+                        MessageBox.Show("Đã xóa danh mục khỏi CSDL thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
             }
         }
 
+        // 6. TÌM KIẾM DANH MỤC
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            LoadCategoryDataGrid();
+        }
+
+        // 7. LÀM MỚI FORM (RESET)
         private void btnClear_Click(object sender, EventArgs e)
         {
             ClearInputs();
-        }
-
-        private void btnSearch_Click(object sender, EventArgs e)
-        {
-            string keyword = txtSearch.Text.Trim().ToLower();
-            var filtered = categoryList.Where(c => string.IsNullOrEmpty(keyword) || c.Name.ToLower().Contains(keyword)).ToList();
-            LoadCategoryDataGrid(filtered);
         }
 
         private void ClearInputs()
@@ -149,6 +194,8 @@ namespace LTWIN.Forms
             selectedCategoryId = -1;
             txtCategoryName.Text = string.Empty;
             txtDescription.Text = string.Empty;
+            txtSearch.Text = string.Empty;
+            txtCategoryName.Focus();
         }
     }
 }

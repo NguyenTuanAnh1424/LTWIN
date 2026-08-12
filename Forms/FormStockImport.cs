@@ -5,11 +5,14 @@ using System.Linq;
 using System.Windows.Forms;
 using LTWIN.Models;
 using LTWIN.Services;
-
 using LTWIN.Utils;
 
 namespace LTWIN.Forms
 {
+    /// <summary>
+    /// MÀN HÌNH QUẢN LÝ NHẬP KHO SẢN PHẨM GIÀY (FORMSTOCKIMPORT.CS)
+    /// Tải sản phẩm từ SQL Server, cho phép lập phiếu nhập và tự động cộng dồn số lượng tồn kho vào CSDL.
+    /// </summary>
     public partial class FormStockImport : Form
     {
         public class ImportCartItem
@@ -21,34 +24,23 @@ namespace LTWIN.Forms
             public decimal TotalPrice => UnitPrice * Quantity;
         }
 
-        private List<Product> productList;
-        private List<ImportCartItem> importCartList;
+        private List<Product> productList = new List<Product>();
+        private List<ImportCartItem> importCartList = new List<ImportCartItem>();
 
         public FormStockImport()
         {
             InitializeComponent();
-            importCartList = new List<ImportCartItem>();
-            InitMockProducts();
         }
 
-        private void InitMockProducts()
-        {
-            productList = new List<Product>
-            {
-                new Product { ProductId = 1, Name = "Nike Air Max 270 React", Price = 3200000, StockQuantity = 15 },
-                new Product { ProductId = 2, Name = "Adidas Ultraboost 22", Price = 3850000, StockQuantity = 8 },
-                new Product { ProductId = 3, Name = "Air Jordan 1 Retro High", Price = 4500000, StockQuantity = 5 },
-                new Product { ProductId = 4, Name = "Puma RS-X Reinvent", Price = 2490000, StockQuantity = 20 }
-            };
-        }
-
+        // 1. SỰ KIỆN FORM LOAD -> TẢI DỮ LIỆU TỪ SQL SERVER
         private void FormStockImport_Load(object sender, EventArgs e)
         {
             ThemeHelper.StyleDataGridView(dgvImportCart);
             ThemeHelper.StyleDataGridView(dgvHistoryReceipts);
             ThemeHelper.StyleDataGridView(dgvHistoryDetails);
+
             LoadSuppliers();
-            LoadProductsComboBox();
+            LoadProductsFromDatabase();
             UpdateImportCartGrid();
             LoadImportHistoryGrid();
         }
@@ -58,11 +50,17 @@ namespace LTWIN.Forms
             cmbSupplier.DataSource = new List<string>(StockImportStore.Suppliers);
         }
 
-        private void LoadProductsComboBox()
+        // TẢI DANH SÁCH SẢN PHẨM TỪ SQL SERVER
+        private void LoadProductsFromDatabase()
         {
-            cmbProducts.DataSource = productList;
-            cmbProducts.DisplayMember = "Name";
-            cmbProducts.ValueMember = "ProductId";
+            using (var db = new QlyBanGiayContext())
+            {
+                productList = db.Products.ToList();
+
+                cmbProducts.DataSource = productList;
+                cmbProducts.DisplayMember = "Name";
+                cmbProducts.ValueMember = "ProductId";
+            }
         }
 
         private void cmbProducts_SelectedIndexChanged(object sender, EventArgs e)
@@ -75,6 +73,7 @@ namespace LTWIN.Forms
             }
         }
 
+        // 2. THÊM MẪU GIÀY VÀO PHIẾU NHẬP
         private void btnAddImportItem_Click(object sender, EventArgs e)
         {
             if (cmbProducts.SelectedItem is Product selectedProduct)
@@ -124,12 +123,14 @@ namespace LTWIN.Forms
 
             dgvImportCart.DataSource = displayData;
 
-            DataGridViewButtonColumn btnRemoveCol = new DataGridViewButtonColumn();
-            btnRemoveCol.Name = "colRemove";
-            btnRemoveCol.HeaderText = "Xóa";
-            btnRemoveCol.Text = "🗑️ Xóa";
-            btnRemoveCol.UseColumnTextForButtonValue = true;
-            btnRemoveCol.FlatStyle = FlatStyle.Flat;
+            DataGridViewButtonColumn btnRemoveCol = new DataGridViewButtonColumn
+            {
+                Name = "colRemove",
+                HeaderText = "Xóa",
+                Text = "🗑️ Xóa",
+                UseColumnTextForButtonValue = true,
+                FlatStyle = FlatStyle.Flat
+            };
             dgvImportCart.Columns.Add(btnRemoveCol);
 
             decimal grandTotal = importCartList.Sum(i => i.TotalPrice);
@@ -163,6 +164,7 @@ namespace LTWIN.Forms
             }
         }
 
+        // 3. XÁC NHẬN NHẬP KHO -> CỘNG TỒN KHO TRỰC TIẾP VÀO SQL SERVER
         private void btnConfirmImport_Click(object sender, EventArgs e)
         {
             if (!importCartList.Any())
@@ -180,23 +182,37 @@ namespace LTWIN.Forms
             string receiptCode = "NK" + DateTime.Now.ToString("yyyyMMddHHmmss");
             decimal totalImportAmount = importCartList.Sum(i => i.TotalPrice);
 
-            // Cập nhật số lượng tồn kho cho sản phẩm
-            foreach (var cartItem in importCartList)
+            try
             {
-                var p = productList.FirstOrDefault(x => x.ProductId == cartItem.ProductId);
-                if (p != null)
+                using (var db = new QlyBanGiayContext())
                 {
-                    p.StockQuantity += cartItem.Quantity;
+                    // Cập nhật số lượng tồn kho vào CSDL SQL Server
+                    foreach (var cartItem in importCartList)
+                    {
+                        var product = db.Products.FirstOrDefault(p => p.ProductId == cartItem.ProductId);
+                        if (product != null)
+                        {
+                            product.StockQuantity += cartItem.Quantity;
+                        }
+                    }
+
+                    db.SaveChanges(); // LƯU VÀO CSDL SQL SERVER
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi cập nhật số lượng tồn kho vào SQL Server: " + ex.Message, "Lỗi Nhập Kho", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
+            // Chuẩn bị nội dung in phiếu nhập kho
             string receiptContent = $"========================================\n" +
                                     $"       PHIẾU NHẬP KHO HÀNG SNEAKER STORE\n" +
                                     $"========================================\n" +
                                     $"Mã Phiếu   : {receiptCode}\n" +
                                     $"Thời Gian  : {DateTime.Now:dd/MM/yyyy HH:mm:ss}\n" +
                                     $"Nhà Cung Cấp: {supplier}\n" +
-                                    $"Người Lập  : Admin Quản Trị\n" +
+                                    $"Người Lập  : Quản Trị Viên (Admin)\n" +
                                     $"Ghi Chú    : {txtNote.Text.Trim()}\n" +
                                     $"----------------------------------------\n";
 
@@ -209,14 +225,15 @@ namespace LTWIN.Forms
             receiptContent += $"----------------------------------------\n" +
                               $"TỔNG GIÁ TRỊ NHẬP KHO: {totalImportAmount:N0} VNĐ\n" +
                               $"========================================\n" +
-                              $"Xác nhận đã nhập hàng thành công vào kho!\n";
+                              $"Xác nhận đã nhập hàng thành công vào SQL Server!\n";
 
+            // Lưu lịch sử phiếu nhập kho
             var receiptRecord = new StockImportReceipt
             {
                 ReceiptCode = receiptCode,
                 ImportDate = DateTime.Now,
                 SupplierName = supplier,
-                CreatedBy = "Admin Quản Trị",
+                CreatedBy = "Quản Trị Viên (Admin)",
                 TotalImportAmount = totalImportAmount,
                 Note = txtNote.Text.Trim(),
                 ReceiptContent = receiptContent,
@@ -231,6 +248,7 @@ namespace LTWIN.Forms
 
             StockImportStore.AddReceipt(receiptRecord);
 
+            // Hiển thị xem trước / In phiếu nhập
             try
             {
                 string fileName = $"PhieuNhapKho_{receiptCode}.txt";
@@ -241,15 +259,20 @@ namespace LTWIN.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show(receiptContent + "\n\n⚠️ Lỗi: " + ex.Message, "Thông Báo Nhập Kho", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(receiptContent + "\n\n⚠️ Lỗi hiển thị: " + ex.Message, "Thông Báo Nhập Kho", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
+            // Reset phiếu nhập và tải lại danh sách sản phẩm mới nhất
             importCartList.Clear();
             txtNote.Clear();
             UpdateImportCartGrid();
+            LoadProductsFromDatabase();
             LoadImportHistoryGrid();
+
+            MessageBox.Show("Đã xác nhận nhập kho và cộng tồn kho vào SQL Server thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        // 4. LỊCH SỬ PHIẾU NHẬP KHO
         private void LoadImportHistoryGrid()
         {
             var history = StockImportStore.ImportHistory;

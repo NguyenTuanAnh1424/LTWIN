@@ -5,87 +5,110 @@ using System.Linq;
 using System.Windows.Forms;
 using LTWIN.Models;
 using LTWIN.Services;
-
 using LTWIN.Utils;
 
 namespace LTWIN.Forms
 {
     public partial class FormOrderHistory : Form
     {
-        private List<POSOrderRecord> currentFilteredOrders;
-
         public FormOrderHistory()
         {
             InitializeComponent();
-            currentFilteredOrders = new List<POSOrderRecord>();
         }
 
         private void FormOrderHistory_Load(object sender, EventArgs e)
         {
-            ThemeHelper.StyleDataGridView(dgvOrders);
-            ThemeHelper.StyleDataGridView(dgvOrderDetails);
+            // Thiết lập các mốc thời gian lọc
+            cmbTimeFilter.Items.Add("Tất cả");
+            cmbTimeFilter.Items.Add("Hôm nay");
+            cmbTimeFilter.Items.Add("Tháng này");
             cmbTimeFilter.SelectedIndex = 0;
-            LoadOrderList();
         }
 
+        // HÀM CHÍNH: TẢI VÀ LỌC DỮ LIỆU TỪ SQL SERVER
         private void LoadOrderList()
         {
             string keyword = txtSearch.Text.Trim().ToLower();
             int timeOption = cmbTimeFilter.SelectedIndex;
 
-            var list = OrderStore.OrderHistory.AsEnumerable();
-
-            if (!string.IsNullOrEmpty(keyword))
+            using (var db = new QlyBanGiayContext())
             {
-                list = list.Where(o => o.InvoiceCode.ToLower().Contains(keyword) || o.CustomerName.ToLower().Contains(keyword));
-            }
+                var query = db.Orders.AsQueryable();
 
-            if (timeOption == 1) // Hôm nay
-            {
-                list = list.Where(o => o.OrderDate.Date == DateTime.Today);
-            }
-            else if (timeOption == 2) // 7 ngày gần đây
-            {
-                list = list.Where(o => o.OrderDate.Date >= DateTime.Today.AddDays(-7));
-            }
-            else if (timeOption == 3) // Tháng này
-            {
-                list = list.Where(o => o.OrderDate.Month == DateTime.Today.Month && o.OrderDate.Year == DateTime.Today.Year);
-            }
+                // 1. Lọc theo thời gian
+                DateTime today = DateTime.Now.Date;
+                if (timeOption == 1) // Hôm nay
+                {
+                    DateTime endOfDay = today.AddDays(1).AddTicks(-1);
+                    query = query.Where(o => o.OrderDate >= today && o.OrderDate <= endOfDay);
+                }
+                else if (timeOption == 2) // Tháng này
+                {
+                    DateTime startOfMonth = new DateTime(today.Year, today.Month, 1);
+                    DateTime endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
+                    query = query.Where(o => o.OrderDate >= startOfMonth && o.OrderDate <= endOfMonth);
+                }
 
-            currentFilteredOrders = list.ToList();
+                // 2. Lọc theo từ khóa (Mã hóa đơn hoặc tên khách)
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(o => o.OrderId.ToString().Contains(keyword) ||
+                                             (o.User != null && o.User.FullName.ToLower().Contains(keyword)));
+                }
 
-            var displayData = currentFilteredOrders.Select(o => new
-            {
-                Mã_Hóa_Đơn = o.InvoiceCode,
-                Thời_Gian = o.OrderDate.ToString("dd/MM/yyyy HH:mm"),
-                Khách_Hàng = o.CustomerName,
-                Tổng_Tiền_Hàng = o.SubTotal.ToString("N0") + " VNĐ",
-                Chiết_Khấu = o.Discount.ToString("N0") + " VNĐ",
-                Tổng_Thanh_Toán = o.GrandTotal.ToString("N0") + " VNĐ",
-                Trạng_Thái = o.Status
-            }).ToList();
+                // 3. Lấy dữ liệu từ DB lên bộ nhớ (sắp xếp mới nhất lên đầu)
+                var resultList = query.OrderByDescending(o => o.OrderDate).ToList();
 
-            dgvOrders.DataSource = displayData;
+                // 4. Ánh xạ sang cấu trúc hiển thị trên DataGridView (Đã xóa các toán tử ??)
+                var displayData = resultList.Select(o => new
+                {
+                    Mã_Hóa_Đơn = o.OrderId,
+                    Thời_Gian = o.OrderDate.HasValue ? o.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "",
+                    Khách_Hàng = o.User != null ? o.User.FullName : "Khách Lẻ",
+                    Tổng_Thanh_Toán = o.TotalAmount.ToString("N0") + " VNĐ",
+                    Trạng_Thái = string.IsNullOrEmpty(o.Status) ? "Hoàn Thành" : o.Status
+                }).ToList();
 
-            decimal totalRevenue = currentFilteredOrders.Where(o => o.Status == "Hoàn Thành").Sum(o => o.GrandTotal);
-            lblSummary.Text = $"📊 Tổng cộng: {currentFilteredOrders.Count} đơn hàng | Doanh thu thực nhận: {totalRevenue:N0} VNĐ";
+                dgvOrders.DataSource = displayData;
 
-            if (!currentFilteredOrders.Any())
-            {
-                dgvOrderDetails.DataSource = null;
+                // 5. Cập nhật thống kê (Đã xóa toán tử ??)
+                decimal totalRevenue = resultList
+                    .Where(o => string.IsNullOrEmpty(o.Status) || o.Status == "Hoàn Thành")
+                    .Sum(o => o.TotalAmount);
+
+                lblSummary.Text = $"📊 Tổng cộng: {resultList.Count} đơn hàng | Doanh thu thực nhận: {totalRevenue:N0} VNĐ";
+
+                // Xóa lưới chi tiết nếu không có dữ liệu
+                if (!resultList.Any())
+                {
+                    dgvOrderDetails.DataSource = null;
+                }
             }
         }
 
+        // SỰ KIỆN: BẤM VÀO HÓA ĐƠN -> HIỂN THỊ CHI TIẾT
         private void dgvOrders_SelectionChanged(object sender, EventArgs e)
         {
             if (dgvOrders.SelectedRows.Count > 0)
             {
-                int index = dgvOrders.SelectedRows[0].Index;
-                if (index >= 0 && index < currentFilteredOrders.Count)
+                // Lấy Mã Hóa Đơn từ dòng đang được chọn
+                int orderId = Convert.ToInt32(dgvOrders.SelectedRows[0].Cells["Mã_Hóa_Đơn"].Value);
+
+                using (var db = new QlyBanGiayContext())
                 {
-                    var selectedOrder = currentFilteredOrders[index];
-                    DisplayOrderDetails(selectedOrder);
+                    // Đã xóa các toán tử ??
+                    var details = db.OrderDetails
+                                    .Where(od => od.OrderId == orderId)
+                                    .Select(od => new
+                                    {
+                                        Mã_SP = od.ProductId,
+                                        Tên_Mẫu_Giày = od.Product.Name,
+                                        Đơn_Giá = od.UnitPrice.ToString("N0") + " VNĐ",
+                                        Số_Lượng = od.Quantity + " đôi",
+                                        Thành_Tiền = (od.UnitPrice * od.Quantity).ToString("N0") + " VNĐ"
+                                    }).ToList();
+
+                    dgvOrderDetails.DataSource = details;
                 }
             }
             else
@@ -94,43 +117,53 @@ namespace LTWIN.Forms
             }
         }
 
-        private void DisplayOrderDetails(POSOrderRecord order)
-        {
-            var displayDetails = order.Items.Select(i => new
-            {
-                Mã_SP = i.ProductId,
-                Tên_Mẫu_Giày = i.ProductName,
-                Đơn_Giá = i.UnitPrice.ToString("N0") + " VNĐ",
-                Số_Lượng = i.Quantity + " đôi",
-                Thành_Tiền = i.TotalPrice.ToString("N0") + " VNĐ"
-            }).ToList();
-
-            dgvOrderDetails.DataSource = displayDetails;
-        }
-
+        // TÌM KIẾM THEO TỪ KHÓA
         private void btnSearch_Click(object sender, EventArgs e)
         {
             LoadOrderList();
         }
 
+        // LỌC THEO COMBOBOX
         private void cmbTimeFilter_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadOrderList();
         }
 
+        // IN LẠI HÓA ĐƠN
         private void btnRePrint_Click(object sender, EventArgs e)
         {
             if (dgvOrders.SelectedRows.Count > 0)
             {
-                int index = dgvOrders.SelectedRows[0].Index;
-                if (index >= 0 && index < currentFilteredOrders.Count)
-                {
-                    var selectedOrder = currentFilteredOrders[index];
-                    string fileName = $"InLai_{selectedOrder.InvoiceCode}.txt";
+                int orderId = Convert.ToInt32(dgvOrders.SelectedRows[0].Cells["Mã_Hóa_Đơn"].Value);
 
-                    using (FormInvoicePreview previewForm = new FormInvoicePreview("In Lại Hóa Đơn " + selectedOrder.InvoiceCode, selectedOrder.InvoiceContent, fileName))
+                using (var db = new QlyBanGiayContext())
+                {
+                    var order = db.Orders.FirstOrDefault(o => o.OrderId == orderId);
+                    if (order != null)
                     {
-                        previewForm.ShowDialog(this);
+                        string fileName = $"InLai_POS{orderId}.txt";
+                        string customerName = dgvOrders.SelectedRows[0].Cells["Khách_Hàng"].Value.ToString();
+
+                        string invoiceContent = $"=== HÓA ĐƠN BÁN HÀNG SNEAKER STORE ===\n" +
+                                                $"Mã Hóa Đơn : POS{orderId}\n" +
+                                                $"Thời gian  : {order.OrderDate}\n" +
+                                                $"Khách hàng : {customerName}\n" +
+                                                $"----------------------------------------\n";
+
+                        var details = db.OrderDetails.Where(od => od.OrderId == orderId).ToList();
+                        foreach (var item in details)
+                        {
+                            invoiceContent += $"- {item.Product.Name}\n";
+                            invoiceContent += $"  {item.UnitPrice:N0} x {item.Quantity} = {(item.UnitPrice * item.Quantity):N0} VNĐ\n";
+                        }
+                        invoiceContent += $"----------------------------------------\n";
+                        invoiceContent += $"TỔNG CỘNG: {order.TotalAmount:N0} VNĐ\n";
+                        invoiceContent += $"=== (Bản in lại từ hệ thống) ===";
+
+                        using (FormInvoicePreview previewForm = new FormInvoicePreview("In Lại Hóa Đơn POS" + orderId, invoiceContent, fileName))
+                        {
+                            previewForm.ShowDialog(this);
+                        }
                     }
                 }
             }
@@ -140,34 +173,107 @@ namespace LTWIN.Forms
             }
         }
 
+        // HỦY HÓA ĐƠN & HOÀN TRẢ TỒN KHO
         private void btnCancelOrder_Click(object sender, EventArgs e)
         {
             if (dgvOrders.SelectedRows.Count > 0)
             {
-                int index = dgvOrders.SelectedRows[0].Index;
-                if (index >= 0 && index < currentFilteredOrders.Count)
+                int orderId = Convert.ToInt32(dgvOrders.SelectedRows[0].Cells["Mã_Hóa_Đơn"].Value);
+                string currentStatus = dgvOrders.SelectedRows[0].Cells["Trạng_Thái"].Value.ToString();
+
+                if (currentStatus == "Đã Hủy")
                 {
-                    var selectedOrder = currentFilteredOrders[index];
+                    MessageBox.Show("Hóa đơn này đã được hủy trước đó!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
-                    if (selectedOrder.Status == "Đã Hủy")
-                    {
-                        MessageBox.Show("Hóa đơn này đã được hủy trước đó!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
+                var confirm = MessageBox.Show($"Bạn có chắc chắn muốn HỦY HÓA ĐƠN 'POS{orderId}' này không?\n\n(Lưu ý: Số lượng giày của đơn này sẽ được cộng trả lại vào kho)",
+                                              "Xác Nhận Hủy Đơn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                    var confirm = MessageBox.Show($"Bạn có chắc chắn muốn HỦY HÓA ĐƠN '{selectedOrder.InvoiceCode}' này không?", 
-                                                  "Xác Nhận Hủy Đơn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (confirm == DialogResult.Yes)
+                if (confirm == DialogResult.Yes)
+                {
+                    using (var db = new QlyBanGiayContext())
                     {
-                        selectedOrder.Status = "Đã Hủy";
-                        MessageBox.Show($"✅ Đã hủy hóa đơn '{selectedOrder.InvoiceCode}' thành công!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LoadOrderList();
+                        var order = db.Orders.FirstOrDefault(o => o.OrderId == orderId);
+                        if (order != null)
+                        {
+                            // 1. Cập nhật trạng thái hóa đơn
+                            order.Status = "Đã Hủy";
+
+                            // 2. Hoàn trả số lượng vào kho (Bảng Products) - Đã xóa toán tử ??
+                            var orderItems = db.OrderDetails.Where(od => od.OrderId == orderId).ToList();
+                            foreach (var item in orderItems)
+                            {
+                                var product = db.Products.FirstOrDefault(p => p.ProductId == item.ProductId);
+                                if (product != null)
+                                {
+                                    product.StockQuantity = product.StockQuantity + item.Quantity;
+                                }
+                            }
+
+                            // 3. Lưu vào DB
+                            db.SaveChanges();
+
+                            MessageBox.Show($"✅ Đã hủy hóa đơn 'POS{orderId}' thành công và hoàn trả tồn kho!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            // Load lại danh sách
+                            LoadOrderList();
+                        }
                     }
                 }
             }
             else
             {
                 MessageBox.Show("Vui lòng chọn 1 hóa đơn cần hủy!", "Cảnh Báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            if (dgvOrders.Rows.Count == 0)
+            {
+                MessageBox.Show("Không có dữ liệu để xuất!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 2. Mở hộp thoại chọn nơi lưu file
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "CSV files (*.csv)|*.csv";
+            sfd.FileName = $"ThongKeDoanhThu_{DateTime.Now:ddMMyyyy_HHmm}.csv"; // Tên file mặc định có kèm ngày giờ
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    // Sử dụng UTF8Encoding(true) để Excel đọc được tiếng Việt có dấu (BOM)
+                    using (var sw = new System.IO.StreamWriter(sfd.FileName, false, new System.Text.UTF8Encoding(true)))
+                    {
+                        // 3. Ghi dòng tiêu đề (Headers)
+                        var headers = dgvOrders.Columns.Cast<DataGridViewColumn>().Select(c => c.HeaderText);
+                        sw.WriteLine(string.Join(",", headers));
+
+                        // 4. Ghi từng dòng dữ liệu
+                        foreach (DataGridViewRow row in dgvOrders.Rows)
+                        {
+                            var cells = row.Cells.Cast<DataGridViewCell>().Select(c =>
+                            {
+                                string cellValue = c.Value != null ? c.Value.ToString() : "";
+                                // Nếu dữ liệu có chứa dấu phẩy (vd: số tiền), phải bọc trong dấu ngoặc kép để tránh lỗi CSV
+                                if (cellValue.Contains(","))
+                                {
+                                    cellValue = $"\"{cellValue}\"";
+                                }
+                                return cellValue;
+                            });
+                            sw.WriteLine(string.Join(",", cells));
+                        }
+                    }
+                    MessageBox.Show("Xuất báo cáo thành công! Bạn có thể mở file này bằng Excel.", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Có lỗi xảy ra khi xuất file: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
     }

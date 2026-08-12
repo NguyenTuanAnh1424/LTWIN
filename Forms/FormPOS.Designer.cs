@@ -28,6 +28,7 @@ namespace LTWIN.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             panelLeft = new Panel();
             dgvShoesList = new DataGridView();
             panelShoeFilter = new Panel();
@@ -82,7 +83,15 @@ namespace LTWIN.Forms
             dgvShoesList.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvShoesList.BackgroundColor = Color.White;
             dgvShoesList.BorderStyle = BorderStyle.None;
-            dgvShoesList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvShoesList.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dgvShoesList.ColumnHeadersHeight = 40;
             dgvShoesList.Dock = DockStyle.Fill;
             dgvShoesList.Location = new Point(0, 80);
             dgvShoesList.Margin = new Padding(3, 4, 3, 4);
@@ -385,7 +394,7 @@ namespace LTWIN.Forms
             lblPOSHeader.AutoSize = true;
             lblPOSHeader.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             lblPOSHeader.ForeColor = Color.FromArgb(47, 53, 66);
-            lblPOSHeader.Location = new Point(14, 24);
+            lblPOSHeader.Location = new Point(8, 26);
             lblPOSHeader.Name = "lblPOSHeader";
             lblPOSHeader.Size = new Size(177, 25);
             lblPOSHeader.TabIndex = 0;

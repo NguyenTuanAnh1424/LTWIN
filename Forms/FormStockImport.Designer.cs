@@ -80,11 +80,12 @@ namespace LTWIN.Forms
             tabControlStock.Controls.Add(tabCreateImport);
             tabControlStock.Controls.Add(tabImportHistory);
             tabControlStock.Dock = DockStyle.Fill;
-            tabControlStock.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            tabControlStock.Location = new System.Drawing.Point(0, 0);
+            tabControlStock.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            tabControlStock.Location = new Point(0, 0);
+            tabControlStock.Margin = new Padding(3, 4, 3, 4);
             tabControlStock.Name = "tabControlStock";
             tabControlStock.SelectedIndex = 0;
-            tabControlStock.Size = new System.Drawing.Size(960, 595);
+            tabControlStock.Size = new Size(1097, 793);
             tabControlStock.TabIndex = 0;
             // 
             // tabCreateImport
@@ -92,10 +93,11 @@ namespace LTWIN.Forms
             tabCreateImport.Controls.Add(panelImportBody);
             tabCreateImport.Controls.Add(panelImportFooter);
             tabCreateImport.Controls.Add(panelImportHeader);
-            tabCreateImport.Location = new System.Drawing.Point(4, 26);
+            tabCreateImport.Location = new Point(4, 30);
+            tabCreateImport.Margin = new Padding(3, 4, 3, 4);
             tabCreateImport.Name = "tabCreateImport";
-            tabCreateImport.Padding = new System.Windows.Forms.Padding(3);
-            tabCreateImport.Size = new System.Drawing.Size(952, 565);
+            tabCreateImport.Padding = new Padding(3, 4, 3, 4);
+            tabCreateImport.Size = new Size(1089, 759);
             tabCreateImport.TabIndex = 0;
             tabCreateImport.Text = "📦 Lập Phiếu Nhập Kho Mới";
             tabCreateImport.UseVisualStyleBackColor = true;
@@ -104,9 +106,10 @@ namespace LTWIN.Forms
             // 
             panelImportBody.Controls.Add(dgvImportCart);
             panelImportBody.Dock = DockStyle.Fill;
-            panelImportBody.Location = new System.Drawing.Point(3, 103);
+            panelImportBody.Location = new Point(3, 137);
+            panelImportBody.Margin = new Padding(3, 4, 3, 4);
             panelImportBody.Name = "panelImportBody";
-            panelImportBody.Size = new System.Drawing.Size(946, 339);
+            panelImportBody.Size = new Size(1083, 458);
             panelImportBody.TabIndex = 1;
             // 
             // dgvImportCart
@@ -114,23 +117,25 @@ namespace LTWIN.Forms
             dgvImportCart.AllowUserToAddRows = false;
             dgvImportCart.AllowUserToDeleteRows = false;
             dgvImportCart.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvImportCart.BackgroundColor = System.Drawing.Color.White;
-            dgvImportCart.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dgvImportCart.BackgroundColor = Color.White;
+            dgvImportCart.BorderStyle = BorderStyle.None;
             dgvImportCart.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvImportCart.Dock = DockStyle.Fill;
-            dgvImportCart.Location = new System.Drawing.Point(0, 0);
+            dgvImportCart.Location = new Point(0, 0);
+            dgvImportCart.Margin = new Padding(3, 4, 3, 4);
             dgvImportCart.MultiSelect = false;
             dgvImportCart.Name = "dgvImportCart";
             dgvImportCart.RowHeadersVisible = false;
+            dgvImportCart.RowHeadersWidth = 51;
             dgvImportCart.RowTemplate.Height = 32;
             dgvImportCart.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvImportCart.Size = new System.Drawing.Size(946, 339);
+            dgvImportCart.Size = new Size(1083, 458);
             dgvImportCart.TabIndex = 0;
             dgvImportCart.CellContentClick += dgvImportCart_CellContentClick;
             // 
             // panelImportFooter
             // 
-            panelImportFooter.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
+            panelImportFooter.BackColor = Color.FromArgb(248, 249, 250);
             panelImportFooter.Controls.Add(btnConfirmImport);
             panelImportFooter.Controls.Add(btnClearImportCart);
             panelImportFooter.Controls.Add(lblTotalImportMoney);
@@ -138,23 +143,25 @@ namespace LTWIN.Forms
             panelImportFooter.Controls.Add(txtNote);
             panelImportFooter.Controls.Add(lblNoteTitle);
             panelImportFooter.Dock = DockStyle.Bottom;
-            panelImportFooter.Location = new System.Drawing.Point(3, 442);
+            panelImportFooter.Location = new Point(3, 595);
+            panelImportFooter.Margin = new Padding(3, 4, 3, 4);
             panelImportFooter.Name = "panelImportFooter";
-            panelImportFooter.Padding = new System.Windows.Forms.Padding(12);
-            panelImportFooter.Size = new System.Drawing.Size(946, 120);
+            panelImportFooter.Padding = new Padding(14, 16, 14, 16);
+            panelImportFooter.Size = new Size(1083, 160);
             panelImportFooter.TabIndex = 2;
             // 
             // btnConfirmImport
             // 
             btnConfirmImport.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnConfirmImport.BackColor = System.Drawing.Color.FromArgb(46, 213, 115);
+            btnConfirmImport.BackColor = Color.FromArgb(46, 213, 115);
             btnConfirmImport.FlatAppearance.BorderSize = 0;
             btnConfirmImport.FlatStyle = FlatStyle.Flat;
-            btnConfirmImport.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            btnConfirmImport.ForeColor = System.Drawing.Color.White;
-            btnConfirmImport.Location = new System.Drawing.Point(620, 60);
+            btnConfirmImport.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnConfirmImport.ForeColor = Color.White;
+            btnConfirmImport.Location = new Point(693, 75);
+            btnConfirmImport.Margin = new Padding(3, 4, 3, 4);
             btnConfirmImport.Name = "btnConfirmImport";
-            btnConfirmImport.Size = new System.Drawing.Size(310, 48);
+            btnConfirmImport.Size = new Size(373, 65);
             btnConfirmImport.TabIndex = 5;
             btnConfirmImport.Text = "📦 XÁC NHẬN NHẬP KHO && IN PHIẾU";
             btnConfirmImport.UseVisualStyleBackColor = false;
@@ -163,14 +170,15 @@ namespace LTWIN.Forms
             // btnClearImportCart
             // 
             btnClearImportCart.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnClearImportCart.BackColor = System.Drawing.Color.FromArgb(116, 125, 140);
+            btnClearImportCart.BackColor = Color.FromArgb(116, 125, 140);
             btnClearImportCart.FlatAppearance.BorderSize = 0;
             btnClearImportCart.FlatStyle = FlatStyle.Flat;
-            btnClearImportCart.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            btnClearImportCart.ForeColor = System.Drawing.Color.White;
-            btnClearImportCart.Location = new System.Drawing.Point(490, 60);
+            btnClearImportCart.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnClearImportCart.ForeColor = Color.White;
+            btnClearImportCart.Location = new Point(549, 75);
+            btnClearImportCart.Margin = new Padding(3, 4, 3, 4);
             btnClearImportCart.Name = "btnClearImportCart";
-            btnClearImportCart.Size = new System.Drawing.Size(120, 48);
+            btnClearImportCart.Size = new Size(137, 64);
             btnClearImportCart.TabIndex = 4;
             btnClearImportCart.Text = "🗑️ Hủy Phiếu";
             btnClearImportCart.UseVisualStyleBackColor = false;
@@ -180,11 +188,11 @@ namespace LTWIN.Forms
             // 
             lblTotalImportMoney.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             lblTotalImportMoney.AutoSize = true;
-            lblTotalImportMoney.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
-            lblTotalImportMoney.ForeColor = System.Drawing.Color.FromArgb(255, 71, 87);
-            lblTotalImportMoney.Location = new System.Drawing.Point(690, 15);
+            lblTotalImportMoney.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblTotalImportMoney.ForeColor = Color.FromArgb(255, 71, 87);
+            lblTotalImportMoney.Location = new Point(791, 20);
             lblTotalImportMoney.Name = "lblTotalImportMoney";
-            lblTotalImportMoney.Size = new System.Drawing.Size(69, 25);
+            lblTotalImportMoney.Size = new Size(88, 32);
             lblTotalImportMoney.TabIndex = 3;
             lblTotalImportMoney.Text = "0 VNĐ";
             // 
@@ -192,36 +200,37 @@ namespace LTWIN.Forms
             // 
             lblTotalTitle.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             lblTotalTitle.AutoSize = true;
-            lblTotalTitle.Font = new System.Drawing.Font("Segoe UI", 10.5F, System.Drawing.FontStyle.Bold);
-            lblTotalTitle.Location = new System.Drawing.Point(490, 18);
+            lblTotalTitle.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
+            lblTotalTitle.Location = new Point(537, 24);
             lblTotalTitle.Name = "lblTotalTitle";
-            lblTotalTitle.Size = new System.Drawing.Size(193, 19);
+            lblTotalTitle.Size = new Size(248, 25);
             lblTotalTitle.TabIndex = 2;
             lblTotalTitle.Text = "Tổng Giá Trị Lô Hàng Nhập:";
             // 
             // txtNote
             // 
-            txtNote.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            txtNote.Location = new System.Drawing.Point(15, 45);
+            txtNote.Font = new Font("Segoe UI", 9.5F);
+            txtNote.Location = new Point(17, 60);
+            txtNote.Margin = new Padding(3, 4, 3, 4);
             txtNote.Multiline = true;
             txtNote.Name = "txtNote";
             txtNote.PlaceholderText = "Nhập ghi chú cho phiếu nhập kho (Số hợp đồng, đợt giao...)...";
-            txtNote.Size = new System.Drawing.Size(450, 60);
+            txtNote.Size = new Size(514, 79);
             txtNote.TabIndex = 1;
             // 
             // lblNoteTitle
             // 
             lblNoteTitle.AutoSize = true;
-            lblNoteTitle.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            lblNoteTitle.Location = new System.Drawing.Point(15, 18);
+            lblNoteTitle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            lblNoteTitle.Location = new Point(17, 24);
             lblNoteTitle.Name = "lblNoteTitle";
-            lblNoteTitle.Size = new System.Drawing.Size(133, 17);
+            lblNoteTitle.Size = new Size(168, 21);
             lblNoteTitle.TabIndex = 0;
             lblNoteTitle.Text = "Ghi Chú Phiếu Nhập:";
             // 
             // panelImportHeader
             // 
-            panelImportHeader.BackColor = System.Drawing.Color.White;
+            panelImportHeader.BackColor = Color.White;
             panelImportHeader.Controls.Add(btnAddImportItem);
             panelImportHeader.Controls.Add(numImportUnitPrice);
             panelImportHeader.Controls.Add(lblPriceTitle);
@@ -232,21 +241,23 @@ namespace LTWIN.Forms
             panelImportHeader.Controls.Add(cmbSupplier);
             panelImportHeader.Controls.Add(lblSupplierTitle);
             panelImportHeader.Dock = DockStyle.Top;
-            panelImportHeader.Location = new System.Drawing.Point(3, 3);
+            panelImportHeader.Location = new Point(3, 4);
+            panelImportHeader.Margin = new Padding(3, 4, 3, 4);
             panelImportHeader.Name = "panelImportHeader";
-            panelImportHeader.Size = new System.Drawing.Size(946, 100);
+            panelImportHeader.Size = new Size(1083, 133);
             panelImportHeader.TabIndex = 0;
             // 
             // btnAddImportItem
             // 
-            btnAddImportItem.BackColor = System.Drawing.Color.FromArgb(30, 144, 255);
+            btnAddImportItem.BackColor = Color.FromArgb(30, 144, 255);
             btnAddImportItem.FlatAppearance.BorderSize = 0;
             btnAddImportItem.FlatStyle = FlatStyle.Flat;
-            btnAddImportItem.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            btnAddImportItem.ForeColor = System.Drawing.Color.White;
-            btnAddImportItem.Location = new System.Drawing.Point(730, 52);
+            btnAddImportItem.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnAddImportItem.ForeColor = Color.White;
+            btnAddImportItem.Location = new Point(834, 69);
+            btnAddImportItem.Margin = new Padding(3, 4, 3, 4);
             btnAddImportItem.Name = "btnAddImportItem";
-            btnAddImportItem.Size = new System.Drawing.Size(200, 32);
+            btnAddImportItem.Size = new Size(229, 43);
             btnAddImportItem.TabIndex = 8;
             btnAddImportItem.Text = "➕ Thêm Vào Phiếu Nhập";
             btnAddImportItem.UseVisualStyleBackColor = false;
@@ -254,82 +265,86 @@ namespace LTWIN.Forms
             // 
             // numImportUnitPrice
             // 
-            numImportUnitPrice.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            numImportUnitPrice.Font = new Font("Segoe UI", 9.5F);
             numImportUnitPrice.Increment = new decimal(new int[] { 50000, 0, 0, 0 });
-            numImportUnitPrice.Location = new Point(480, 55);
+            numImportUnitPrice.Location = new Point(549, 73);
+            numImportUnitPrice.Margin = new Padding(3, 4, 3, 4);
             numImportUnitPrice.Maximum = new decimal(new int[] { 100000000, 0, 0, 0 });
             numImportUnitPrice.Name = "numImportUnitPrice";
-            numImportUnitPrice.Size = new System.Drawing.Size(230, 24);
+            numImportUnitPrice.Size = new Size(263, 29);
             numImportUnitPrice.TabIndex = 7;
             // 
             // lblPriceTitle
             // 
             lblPriceTitle.AutoSize = true;
-            lblPriceTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            lblPriceTitle.Location = new Point(380, 59);
+            lblPriceTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblPriceTitle.Location = new Point(434, 79);
             lblPriceTitle.Name = "lblPriceTitle";
-            lblPriceTitle.Size = new System.Drawing.Size(89, 15);
+            lblPriceTitle.Size = new Size(111, 20);
             lblPriceTitle.TabIndex = 6;
             lblPriceTitle.Text = "Đơn Giá Nhập:";
             // 
             // numImportQuantity
             // 
-            numImportQuantity.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            numImportQuantity.Location = new Point(115, 55);
+            numImportQuantity.Font = new Font("Segoe UI", 9.5F);
+            numImportQuantity.Location = new Point(131, 73);
+            numImportQuantity.Margin = new Padding(3, 4, 3, 4);
             numImportQuantity.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
             numImportQuantity.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numImportQuantity.Name = "numImportQuantity";
-            numImportQuantity.Size = new System.Drawing.Size(245, 24);
+            numImportQuantity.Size = new Size(280, 29);
             numImportQuantity.TabIndex = 5;
             numImportQuantity.Value = new decimal(new int[] { 10, 0, 0, 0 });
             // 
             // lblQuantityTitle
             // 
             lblQuantityTitle.AutoSize = true;
-            lblQuantityTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            lblQuantityTitle.Location = new Point(15, 59);
+            lblQuantityTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblQuantityTitle.Location = new Point(17, 79);
             lblQuantityTitle.Name = "lblQuantityTitle";
-            lblQuantityTitle.Size = new System.Drawing.Size(95, 15);
+            lblQuantityTitle.Size = new Size(121, 20);
             lblQuantityTitle.TabIndex = 4;
             lblQuantityTitle.Text = "Số Lượng Nhập:";
             // 
             // cmbProducts
             // 
             cmbProducts.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbProducts.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            cmbProducts.Font = new Font("Segoe UI", 9.5F);
             cmbProducts.FormattingEnabled = true;
-            cmbProducts.Location = new Point(480, 14);
+            cmbProducts.Location = new Point(549, 19);
+            cmbProducts.Margin = new Padding(3, 4, 3, 4);
             cmbProducts.Name = "cmbProducts";
-            cmbProducts.Size = new System.Drawing.Size(450, 25);
+            cmbProducts.Size = new Size(514, 29);
             cmbProducts.TabIndex = 3;
             cmbProducts.SelectedIndexChanged += cmbProducts_SelectedIndexChanged;
             // 
             // lblProductTitle
             // 
             lblProductTitle.AutoSize = true;
-            lblProductTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            lblProductTitle.Location = new Point(380, 18);
+            lblProductTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblProductTitle.Location = new Point(434, 24);
             lblProductTitle.Name = "lblProductTitle";
-            lblProductTitle.Size = new System.Drawing.Size(94, 15);
+            lblProductTitle.Size = new Size(121, 20);
             lblProductTitle.TabIndex = 2;
             lblProductTitle.Text = "Mẫu Giày Nhập:";
             // 
             // cmbSupplier
             // 
-            cmbSupplier.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            cmbSupplier.Font = new Font("Segoe UI", 9.5F);
             cmbSupplier.FormattingEnabled = true;
-            cmbSupplier.Location = new Point(115, 14);
+            cmbSupplier.Location = new Point(131, 19);
+            cmbSupplier.Margin = new Padding(3, 4, 3, 4);
             cmbSupplier.Name = "cmbSupplier";
-            cmbSupplier.Size = new System.Drawing.Size(245, 25);
+            cmbSupplier.Size = new Size(279, 29);
             cmbSupplier.TabIndex = 1;
             // 
             // lblSupplierTitle
             // 
             lblSupplierTitle.AutoSize = true;
-            lblSupplierTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            lblSupplierTitle.Location = new Point(15, 18);
+            lblSupplierTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblSupplierTitle.Location = new Point(17, 24);
             lblSupplierTitle.Name = "lblSupplierTitle";
-            lblSupplierTitle.Size = new System.Drawing.Size(88, 15);
+            lblSupplierTitle.Size = new Size(112, 20);
             lblSupplierTitle.TabIndex = 0;
             lblSupplierTitle.Text = "Nhà Cung Cấp:";
             // 
@@ -337,10 +352,11 @@ namespace LTWIN.Forms
             // 
             tabImportHistory.Controls.Add(panelHistoryMain);
             tabImportHistory.Controls.Add(panelHistoryBottom);
-            tabImportHistory.Location = new System.Drawing.Point(4, 26);
+            tabImportHistory.Location = new Point(4, 30);
+            tabImportHistory.Margin = new Padding(3, 4, 3, 4);
             tabImportHistory.Name = "tabImportHistory";
-            tabImportHistory.Padding = new System.Windows.Forms.Padding(3);
-            tabImportHistory.Size = new System.Drawing.Size(952, 565);
+            tabImportHistory.Padding = new Padding(3, 4, 3, 4);
+            tabImportHistory.Size = new Size(1089, 759);
             tabImportHistory.TabIndex = 1;
             tabImportHistory.Text = "📜 Lịch Sử Phiếu Nhập Kho";
             tabImportHistory.UseVisualStyleBackColor = true;
@@ -352,22 +368,24 @@ namespace LTWIN.Forms
             panelHistoryMain.Controls.Add(grpHistoryReceipts, 0, 0);
             panelHistoryMain.Controls.Add(grpHistoryDetails, 0, 1);
             panelHistoryMain.Dock = DockStyle.Fill;
-            panelHistoryMain.Location = new System.Drawing.Point(3, 3);
+            panelHistoryMain.Location = new Point(3, 4);
+            panelHistoryMain.Margin = new Padding(3, 4, 3, 4);
             panelHistoryMain.Name = "panelHistoryMain";
             panelHistoryMain.RowCount = 2;
             panelHistoryMain.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             panelHistoryMain.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-            panelHistoryMain.Size = new System.Drawing.Size(946, 504);
+            panelHistoryMain.Size = new Size(1083, 678);
             panelHistoryMain.TabIndex = 0;
             // 
             // grpHistoryReceipts
             // 
             grpHistoryReceipts.Controls.Add(dgvHistoryReceipts);
             grpHistoryReceipts.Dock = DockStyle.Fill;
-            grpHistoryReceipts.Location = new System.Drawing.Point(8, 8);
-            grpHistoryReceipts.Margin = new Padding(8);
+            grpHistoryReceipts.Location = new Point(9, 11);
+            grpHistoryReceipts.Margin = new Padding(9, 11, 9, 11);
             grpHistoryReceipts.Name = "grpHistoryReceipts";
-            grpHistoryReceipts.Size = new System.Drawing.Size(930, 261);
+            grpHistoryReceipts.Padding = new Padding(3, 4, 3, 4);
+            grpHistoryReceipts.Size = new Size(1065, 350);
             grpHistoryReceipts.TabIndex = 0;
             grpHistoryReceipts.TabStop = false;
             grpHistoryReceipts.Text = "📋 Danh Sách Phiếu Nhập Kho Đã Lập";
@@ -377,18 +395,20 @@ namespace LTWIN.Forms
             dgvHistoryReceipts.AllowUserToAddRows = false;
             dgvHistoryReceipts.AllowUserToDeleteRows = false;
             dgvHistoryReceipts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvHistoryReceipts.BackgroundColor = System.Drawing.Color.White;
-            dgvHistoryReceipts.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dgvHistoryReceipts.BackgroundColor = Color.White;
+            dgvHistoryReceipts.BorderStyle = BorderStyle.None;
             dgvHistoryReceipts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvHistoryReceipts.Dock = DockStyle.Fill;
-            dgvHistoryReceipts.Location = new System.Drawing.Point(3, 20);
+            dgvHistoryReceipts.Location = new Point(3, 26);
+            dgvHistoryReceipts.Margin = new Padding(3, 4, 3, 4);
             dgvHistoryReceipts.MultiSelect = false;
             dgvHistoryReceipts.Name = "dgvHistoryReceipts";
             dgvHistoryReceipts.ReadOnly = true;
             dgvHistoryReceipts.RowHeadersVisible = false;
+            dgvHistoryReceipts.RowHeadersWidth = 51;
             dgvHistoryReceipts.RowTemplate.Height = 32;
             dgvHistoryReceipts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvHistoryReceipts.Size = new System.Drawing.Size(924, 238);
+            dgvHistoryReceipts.Size = new Size(1059, 320);
             dgvHistoryReceipts.TabIndex = 0;
             dgvHistoryReceipts.SelectionChanged += dgvHistoryReceipts_SelectionChanged;
             // 
@@ -396,10 +416,11 @@ namespace LTWIN.Forms
             // 
             grpHistoryDetails.Controls.Add(dgvHistoryDetails);
             grpHistoryDetails.Dock = DockStyle.Fill;
-            grpHistoryDetails.Location = new System.Drawing.Point(8, 285);
-            grpHistoryDetails.Margin = new Padding(8);
+            grpHistoryDetails.Location = new Point(9, 383);
+            grpHistoryDetails.Margin = new Padding(9, 11, 9, 11);
             grpHistoryDetails.Name = "grpHistoryDetails";
-            grpHistoryDetails.Size = new System.Drawing.Size(930, 211);
+            grpHistoryDetails.Padding = new Padding(3, 4, 3, 4);
+            grpHistoryDetails.Size = new Size(1065, 284);
             grpHistoryDetails.TabIndex = 1;
             grpHistoryDetails.TabStop = false;
             grpHistoryDetails.Text = "👟 Chi Tiết Hàng Giày Trong Phiếu Nhập Chọn";
@@ -409,43 +430,47 @@ namespace LTWIN.Forms
             dgvHistoryDetails.AllowUserToAddRows = false;
             dgvHistoryDetails.AllowUserToDeleteRows = false;
             dgvHistoryDetails.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvHistoryDetails.BackgroundColor = System.Drawing.Color.White;
-            dgvHistoryDetails.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dgvHistoryDetails.BackgroundColor = Color.White;
+            dgvHistoryDetails.BorderStyle = BorderStyle.None;
             dgvHistoryDetails.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvHistoryDetails.Dock = DockStyle.Fill;
-            dgvHistoryDetails.Location = new System.Drawing.Point(3, 20);
+            dgvHistoryDetails.Location = new Point(3, 26);
+            dgvHistoryDetails.Margin = new Padding(3, 4, 3, 4);
             dgvHistoryDetails.MultiSelect = false;
             dgvHistoryDetails.Name = "dgvHistoryDetails";
             dgvHistoryDetails.ReadOnly = true;
             dgvHistoryDetails.RowHeadersVisible = false;
+            dgvHistoryDetails.RowHeadersWidth = 51;
             dgvHistoryDetails.RowTemplate.Height = 30;
             dgvHistoryDetails.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvHistoryDetails.Size = new System.Drawing.Size(924, 188);
+            dgvHistoryDetails.Size = new Size(1059, 254);
             dgvHistoryDetails.TabIndex = 0;
             // 
             // panelHistoryBottom
             // 
-            panelHistoryBottom.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
+            panelHistoryBottom.BackColor = Color.FromArgb(248, 249, 250);
             panelHistoryBottom.Controls.Add(btnRePrintReceipt);
             panelHistoryBottom.Controls.Add(lblHistorySummary);
             panelHistoryBottom.Dock = DockStyle.Bottom;
-            panelHistoryBottom.Location = new System.Drawing.Point(3, 507);
+            panelHistoryBottom.Location = new Point(3, 682);
+            panelHistoryBottom.Margin = new Padding(3, 4, 3, 4);
             panelHistoryBottom.Name = "panelHistoryBottom";
-            panelHistoryBottom.Padding = new System.Windows.Forms.Padding(12);
-            panelHistoryBottom.Size = new System.Drawing.Size(946, 55);
+            panelHistoryBottom.Padding = new Padding(14, 16, 14, 16);
+            panelHistoryBottom.Size = new Size(1083, 73);
             panelHistoryBottom.TabIndex = 1;
             // 
             // btnRePrintReceipt
             // 
             btnRePrintReceipt.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnRePrintReceipt.BackColor = System.Drawing.Color.FromArgb(30, 144, 255);
+            btnRePrintReceipt.BackColor = Color.FromArgb(30, 144, 255);
             btnRePrintReceipt.FlatAppearance.BorderSize = 0;
             btnRePrintReceipt.FlatStyle = FlatStyle.Flat;
-            btnRePrintReceipt.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            btnRePrintReceipt.ForeColor = System.Drawing.Color.White;
-            btnRePrintReceipt.Location = new System.Drawing.Point(735, 10);
+            btnRePrintReceipt.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnRePrintReceipt.ForeColor = Color.White;
+            btnRePrintReceipt.Location = new Point(842, 13);
+            btnRePrintReceipt.Margin = new Padding(3, 4, 3, 4);
             btnRePrintReceipt.Name = "btnRePrintReceipt";
-            btnRePrintReceipt.Size = new System.Drawing.Size(195, 36);
+            btnRePrintReceipt.Size = new Size(223, 48);
             btnRePrintReceipt.TabIndex = 1;
             btnRePrintReceipt.Text = "🖨️ Xem && In Lại Phiếu Nhập";
             btnRePrintReceipt.UseVisualStyleBackColor = false;
@@ -454,20 +479,21 @@ namespace LTWIN.Forms
             // lblHistorySummary
             // 
             lblHistorySummary.AutoSize = true;
-            lblHistorySummary.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            lblHistorySummary.ForeColor = System.Drawing.Color.FromArgb(47, 53, 66);
-            lblHistorySummary.Location = new System.Drawing.Point(15, 18);
+            lblHistorySummary.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblHistorySummary.ForeColor = Color.FromArgb(47, 53, 66);
+            lblHistorySummary.Location = new Point(17, 24);
             lblHistorySummary.Name = "lblHistorySummary";
-            lblHistorySummary.Size = new System.Drawing.Size(252, 19);
+            lblHistorySummary.Size = new Size(348, 23);
             lblHistorySummary.TabIndex = 0;
             lblHistorySummary.Text = "📊 Tổng phiếu nhập: 0 | Tổng vốn: 0 VNĐ";
             // 
             // FormStockImport
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(960, 595);
+            ClientSize = new Size(1097, 793);
             Controls.Add(tabControlStock);
+            Margin = new Padding(3, 4, 3, 4);
             Name = "FormStockImport";
             Text = "Quản Lý Nhập Kho Sản Phẩm";
             Load += FormStockImport_Load;

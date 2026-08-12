@@ -22,9 +22,13 @@ namespace LTWIN.Forms
 
             lblTitle.Text = "📄 " + title.ToUpper();
             this.Text = title;
+
+            // Đặt font chữ Consolas để các cột và dòng trong hóa đơn thẳng hàng đẹp mắt
+            rtbContent.Font = new Font("Consolas", 10F, FontStyle.Regular);
             rtbContent.Text = content;
         }
 
+        // 1. TÍNH NĂNG LƯU FILE (.TXT / .HTML / .CSV)
         private void btnSaveFile_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -52,7 +56,7 @@ namespace LTWIN.Forms
                         }
 
                         File.WriteAllText(saveFileDialog.FileName, finalContent, Encoding.UTF8);
-                        MessageBox.Show($"✅ Đã lưu tệp thành công tại:\n{saveFileDialog.FileName}", 
+                        MessageBox.Show($"✅ Đã lưu tệp thành công tại:\n{saveFileDialog.FileName}",
                                         "Lưu Tệp Thành Công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
@@ -63,6 +67,7 @@ namespace LTWIN.Forms
             }
         }
 
+        // 2. TÍNH NĂNG IN TRỰC TIẾP / XEM TRƯỚC BẢN IN (ĐÃ SỬA LỖI TRẮNG TRANG)
         private void btnPrint_Click(object sender, EventArgs e)
         {
             try
@@ -72,6 +77,12 @@ namespace LTWIN.Forms
 
                 int linesPrinted = 0;
                 string[] lines = documentContent.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+                // RESET BIẾN KHI BẮT ĐẦU MỖI LẦN IN / LẦN LẬT TRANG PREVIEW
+                printDoc.BeginPrint += (s, ev) =>
+                {
+                    linesPrinted = 0;
+                };
 
                 printDoc.PrintPage += (s, ev) =>
                 {
@@ -97,10 +108,7 @@ namespace LTWIN.Forms
                     if (linesPrinted < lines.Length)
                         ev.HasMorePages = true;
                     else
-                    {
                         ev.HasMorePages = false;
-                        linesPrinted = 0;
-                    }
                 };
 
                 PrintPreviewDialog previewDialog = new PrintPreviewDialog();
@@ -122,6 +130,7 @@ namespace LTWIN.Forms
             this.Close();
         }
 
+        // HÀM CHUYỂN ĐỔI SANG HTML TỰ ĐỘNG
         private string ConvertToHtml(string title, string content)
         {
             StringBuilder sb = new StringBuilder();
@@ -138,6 +147,7 @@ namespace LTWIN.Forms
             return sb.ToString();
         }
 
+        // HÀM CHUYỂN ĐỔI SANG CSV TỰ ĐỘNG
         private string ConvertToCsv(string content)
         {
             StringBuilder sb = new StringBuilder();
