@@ -39,6 +39,12 @@ Dự án Đồ Án Lập Trình Windows (WinForms .NET 8.0 / C#) hỗ trợ qu�
 - Lọc số liệu linh hoạt (*Hôm nay, 7 ngày qua, Tháng này, Tất cả thời gian*).
 - 4 Thẻ KPI tổng quan: Doanh thu, Số đơn bán, Số đôi đã bán, Giá trị trung bình/đơn.
 
+### 8. 👤 Quản Lý Nhân Viên & Tài Khoản (FormEmployee)
+- **Thêm nhân viên mới**: Đăng ký tài khoản hệ thống mới với tên đăng nhập, mật khẩu mã hóa an toàn, số điện thoại và phân quyền linh hoạt.
+- **Cập nhật & Đổi mật khẩu**: Chỉnh sửa thông tin liên lạc hoặc thay đổi mật khẩu tài khoản nhân viên nhanh chóng.
+- **Phân quyền truy cập**: Quản lý cấp bậc quyền hạn rõ ràng giữa **Quản Trị Viên (Admin)** và **Nhân Viên Bán Hàng (Employee)**.
+- **Xóa & Tìm kiếm**: Hỗ trợ tìm kiếm thông tin nhân viên nhanh theo từ khóa/số điện thoại và cơ chế bảo vệ ngăn chặn xóa nhầm tài khoản đang đăng nhập.
+
 ---
 
 ## 🛠️ CÔNG NGHỆ SỬ DỤNG
@@ -57,5 +63,5 @@ Dự án Đồ Án Lập Trình Windows (WinForms .NET 8.0 / C#) hỗ trợ qu�
 2. Mở file giải pháp `LTWIN.sln` bằng Visual Studio 2022.
 3. Bấm **F5** hoặc **Start** để biên dịch & khởi chạy.
 4. Tài khoản dùng thử:
-   - **Admin**: `admin` / `admin123`
+   - **Admin**: `admin` / `123456`
    - **Nhân viên**: `nhanvien` / `123456`
