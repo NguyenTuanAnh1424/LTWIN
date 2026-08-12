@@ -171,10 +171,10 @@ namespace LTWIN.Forms
             int width = panelChartCanvas.Width;
             int height = panelChartCanvas.Height;
 
-            int paddingLeft = 45;
-            int paddingRight = 20;
-            int paddingTop = 30;
-            int paddingBottom = 40;
+            int paddingLeft = 55;
+            int paddingRight = 25;
+            int paddingTop = 35;
+            int paddingBottom = 45;
 
             int chartWidth = width - paddingLeft - paddingRight;
             int chartHeight = height - paddingTop - paddingBottom;
@@ -185,27 +185,39 @@ namespace LTWIN.Forms
             decimal maxValue = chartPoints.Max(p => p.Value);
             if (maxValue <= 0) maxValue = 1;
 
-            // 1. Vẽ các đường kẻ ngang (Gridlines)
-            using (Pen gridPen = new Pen(Color.FromArgb(241, 245, 249), 1))
+            // Tìm cột có doanh thu cao nhất
+            decimal peakVal = chartPoints.Max(p => p.Value);
+
+            // 1. Vẽ các đường kẻ ngang (Gridlines) & Nhãn trục Y (Triệu VNĐ)
+            int linesCount = 4;
+            using (Font yFont = new Font("Segoe UI", 8.0F, FontStyle.Regular))
+            using (Brush yBrush = new SolidBrush(Color.FromArgb(148, 163, 184)))
+            using (Pen gridPen = new Pen(Color.FromArgb(241, 245, 249), 1f))
             {
                 gridPen.DashStyle = DashStyle.Dash;
-                int linesCount = 4;
                 for (int i = 0; i <= linesCount; i++)
                 {
                     int y = paddingTop + (chartHeight * i / linesCount);
                     g.DrawLine(gridPen, paddingLeft, y, width - paddingRight, y);
+
+                    // Nhãn trục Y
+                    decimal gridVal = maxValue * (linesCount - i) / linesCount;
+                    string yText = (gridVal / 1000000m).ToString("0.#") + "M";
+                    SizeF ySize = g.MeasureString(yText, yFont);
+                    g.DrawString(yText, yFont, yBrush, paddingLeft - ySize.Width - 8, y - ySize.Height / 2);
                 }
             }
 
-            // 2. Vẽ các cột doanh thu (Bar Chart)
+            // 2. Tính tọa độ đỉnh của từng cột để vẽ Cột + Đường xu hướng
             int count = chartPoints.Count;
             int totalBarSpace = chartWidth / count;
-            int barWidth = Math.Max(12, (int)(totalBarSpace * 0.55));
+            int barWidth = Math.Max(16, (int)(totalBarSpace * 0.50));
+
+            PointF[] trendPoints = new PointF[count];
 
             using (Font fontLabel = new Font("Segoe UI", 8.5F, FontStyle.Regular))
             using (Font fontValue = new Font("Segoe UI", 8.0F, FontStyle.Bold))
             using (Brush textBrush = new SolidBrush(Color.FromArgb(100, 116, 139)))
-            using (Brush valueBrush = new SolidBrush(Color.FromArgb(79, 70, 229)))
             {
                 for (int i = 0; i < count; i++)
                 {
@@ -216,34 +228,111 @@ namespace LTWIN.Forms
                     int x = paddingLeft + (i * totalBarSpace) + (totalBarSpace - barWidth) / 2;
                     int y = paddingTop + (chartHeight - barH);
 
-                    // Gradient fill cho cột
-                    using (LinearGradientBrush barBrush = new LinearGradientBrush(
-                        new Rectangle(x, y, barWidth, Math.Max(1, barH)),
-                        Color.FromArgb(79, 70, 229),
-                        Color.FromArgb(129, 140, 248),
-                        LinearGradientMode.Vertical))
-                    {
-                        g.FillRectangle(barBrush, x, y, barWidth, Math.Max(1, barH));
-                    }
+                    bool isPeak = pt.Value == peakVal && peakVal > 0;
 
-                    // Viền đỉnh cột
-                    using (Pen topPen = new Pen(Color.FromArgb(67, 56, 202), 1.5f))
-                    {
-                        g.DrawLine(topPen, x, y, x + barWidth, y);
-                    }
+                    // Lưu tọa độ tâm đỉnh cột cho đường xu hướng
+                    trendPoints[i] = new PointF(x + barWidth / 2f, y);
 
-                    // Hiển thị giá trị trên đỉnh cột (Triệu VNĐ)
-                    string valText = (pt.Value / 1000000m).ToString("0.#") + "M";
-                    SizeF valSize = g.MeasureString(valText, fontValue);
-                    g.DrawString(valText, fontValue, valueBrush, x + (barWidth - valSize.Width) / 2, y - valSize.Height - 3);
+                    // Bán kính bo góc đỉnh cột
+                    int radius = Math.Min(6, barWidth / 2);
+
+                    // Đường dẫn hình học cột bo góc đỉnh
+                    using (GraphicsPath path = new GraphicsPath())
+                    {
+                        if (barH > radius * 2)
+                        {
+                            path.AddArc(x, y, radius * 2, radius * 2, 180, 90);
+                            path.AddArc(x + barWidth - radius * 2, y, radius * 2, radius * 2, 270, 90);
+                            path.AddLine(x + barWidth, y + radius, x + barWidth, paddingTop + chartHeight);
+                            path.AddLine(x + barWidth, paddingTop + chartHeight, x, paddingTop + chartHeight);
+                            path.CloseFigure();
+                        }
+                        else
+                        {
+                            path.AddRectangle(new Rectangle(x, y, barWidth, Math.Max(2, barH)));
+                        }
+
+                        // Gradient fill cho cột
+                        Color colStart = isPeak ? Color.FromArgb(99, 102, 241) : Color.FromArgb(129, 140, 248);
+                        Color colEnd = isPeak ? Color.FromArgb(79, 70, 229) : Color.FromArgb(199, 210, 254);
+
+                        using (LinearGradientBrush barBrush = new LinearGradientBrush(
+                            new Rectangle(x, y, barWidth, Math.Max(2, barH)),
+                            colStart, colEnd, LinearGradientMode.Vertical))
+                        {
+                            g.FillPath(barBrush, path);
+                        }
+
+                        // Viền cột peak (nút cao nhất)
+                        if (isPeak)
+                        {
+                            using (Pen peakPen = new Pen(Color.FromArgb(67, 56, 202), 1.5f))
+                            {
+                                g.DrawPath(peakPen, path);
+                            }
+                        }
+                    }
 
                     // Hiển thị nhãn mốc thời gian dưới trục X
                     SizeF lblSize = g.MeasureString(pt.Label, fontLabel);
-                    g.DrawString(pt.Label, fontLabel, textBrush, x + (barWidth - lblSize.Width) / 2, height - paddingBottom + 8);
+                    g.DrawString(pt.Label, fontLabel, textBrush, x + (barWidth - lblSize.Width) / 2, height - paddingBottom + 10);
+                }
+
+                // 3. Vẽ Đường Xu Hướng Spline Mượt Mà (Bezier Curve) đè lên đỉnh các cột
+                if (count > 1)
+                {
+                    using (Pen linePen = new Pen(Color.FromArgb(16, 185, 129), 2.5f)) // Màu xanh Ngọc Lục Bảo
+                    {
+                        linePen.LineJoin = LineJoin.Round;
+                        g.DrawCurve(linePen, trendPoints, 0.4f);
+                    }
+
+                    // Vẽ các nút điểm tròn trên đường xu hướng
+                    for (int i = 0; i < count; i++)
+                    {
+                        var pt = chartPoints[i];
+                        PointF tp = trendPoints[i];
+                        bool isPeak = pt.Value == peakVal && peakVal > 0;
+
+                        float dotSize = isPeak ? 9f : 7f;
+                        RectangleF dotRect = new RectangleF(tp.X - dotSize / 2f, tp.Y - dotSize / 2f, dotSize, dotSize);
+
+                        using (Brush dotBrush = new SolidBrush(isPeak ? Color.FromArgb(239, 68, 68) : Color.FromArgb(16, 185, 129)))
+                        using (Pen dotBorderPen = new Pen(Color.White, 2f))
+                        {
+                            g.FillEllipse(dotBrush, dotRect);
+                            g.DrawEllipse(dotBorderPen, dotRect);
+                        }
+
+                        // Hiển thị Badge giá trị mượt trên đỉnh điểm
+                        string valText = (pt.Value / 1000000m).ToString("0.#") + "M";
+                        SizeF valSize = g.MeasureString(valText, fontValue);
+
+                        int badgePaddingH = 5;
+                        int badgePaddingV = 2;
+                        RectangleF badgeBg = new RectangleF(
+                            tp.X - valSize.Width / 2f - badgePaddingH,
+                            tp.Y - valSize.Height - 12f,
+                            valSize.Width + badgePaddingH * 2,
+                            valSize.Height + badgePaddingV * 2);
+
+                        Color badgeBgColor = isPeak ? Color.FromArgb(254, 242, 242) : Color.FromArgb(240, 253, 244);
+                        Color badgeTextColor = isPeak ? Color.FromArgb(220, 38, 38) : Color.FromArgb(15, 118, 110);
+
+                        using (GraphicsPath badgePath = ThemeHelper.CreateRoundedRectanglePath(badgeBg, 4))
+                        using (Brush bBgBrush = new SolidBrush(badgeBgColor))
+                        using (Pen bBorderPen = new Pen(isPeak ? Color.FromArgb(252, 165, 165) : Color.FromArgb(167, 243, 208), 1f))
+                        using (Brush bTextBrush = new SolidBrush(badgeTextColor))
+                        {
+                            g.FillPath(bBgBrush, badgePath);
+                            g.DrawPath(bBorderPen, badgePath);
+                            g.DrawString(valText, fontValue, bTextBrush, tp.X - valSize.Width / 2f, tp.Y - valSize.Height - 10f);
+                        }
+                    }
                 }
             }
 
-            // 3. Vẽ trục hoành X
+            // 4. Vẽ trục hoành X
             using (Pen axisPen = new Pen(Color.FromArgb(203, 213, 225), 1.5f))
             {
                 g.DrawLine(axisPen, paddingLeft, height - paddingBottom, width - paddingRight, height - paddingBottom);
