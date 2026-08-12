@@ -339,7 +339,8 @@ namespace LTWIN.Forms
                         {
                             OrderDate = DateTime.Now,
                             TotalAmount = grandTotal,
-                            UserId = UserSession.UserId > 0 ? UserSession.UserId : 1
+                            UserId = UserSession.UserId > 0 ? UserSession.UserId : 1,
+                            CustomerId = (customerId > 0) ? customerId : (int?)null
                         };
 
                         db.Orders.Add(newOrder);

@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using LTWIN.Models;
 using LTWIN.Services;
 using LTWIN.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace LTWIN.Forms
 {
@@ -33,7 +34,7 @@ namespace LTWIN.Forms
 
             using (var db = new QlyBanGiayContext())
             {
-                var query = db.Orders.AsQueryable();
+                var query = db.Orders.Include(o => o.Customer).AsQueryable();
 
                 // 1. Lọc theo thời gian
                 DateTime today = DateTime.Now.Date;
@@ -52,8 +53,9 @@ namespace LTWIN.Forms
                 // 2. Lọc theo từ khóa (Mã hóa đơn hoặc tên khách)
                 if (!string.IsNullOrEmpty(keyword))
                 {
+                    string lowerKeyword = keyword.ToLower();
                     query = query.Where(o => o.OrderId.ToString().Contains(keyword) ||
-                                             (o.User != null && o.User.FullName.ToLower().Contains(keyword)));
+                                            (o.Customer != null && o.Customer.FullName.ToLower().Contains(lowerKeyword)));
                 }
 
                 // 3. Lấy dữ liệu từ DB lên bộ nhớ (sắp xếp mới nhất lên đầu)
@@ -64,7 +66,7 @@ namespace LTWIN.Forms
                 {
                     Mã_Hóa_Đơn = o.OrderId,
                     Thời_Gian = o.OrderDate.HasValue ? o.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "",
-                    Khách_Hàng = o.User != null ? o.User.FullName : "Khách Lẻ",
+                    Khách_Hàng = o.Customer != null ? o.Customer.FullName : "Khách Lẻ",
                     Tổng_Thanh_Toán = o.TotalAmount.ToString("N0") + " VNĐ",
                     Trạng_Thái = string.IsNullOrEmpty(o.Status) ? "Hoàn Thành" : o.Status
                 }).ToList();
@@ -150,7 +152,7 @@ namespace LTWIN.Forms
                                                 $"Khách hàng : {customerName}\n" +
                                                 $"----------------------------------------\n";
 
-                        var details = db.OrderDetails.Where(od => od.OrderId == orderId).ToList();
+                        var details = db.OrderDetails.Include(od => od.Product).Where(od => od.OrderId == orderId).ToList();
                         foreach (var item in details)
                         {
                             invoiceContent += $"- {item.Product.Name}\n";
